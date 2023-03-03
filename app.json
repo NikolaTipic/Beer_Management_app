@@ -1,5 +1,6 @@
 {
   "expo": {
+    "userInterfaceStyle": "automatic",
     "name": "Beer",
     "slug": "Beer",
     "version": "1.0.0",
@@ -27,6 +28,9 @@
     },
     "web": {
       "favicon": "./assets/favicon.png"
-    }
+    },
+    "plugins": [
+      "expo-navigation-bar"
+    ]
   }
 }
