@@ -34,7 +34,9 @@ import KeyboardAvoidingWrapper from '../components/KeyboardAvoidingWrapper';
 //axios
 import axios from 'axios';
 
-export default function AddMenu({ navigation }) {
+
+
+export default function Transfers({ navigation }) {
 
     //context
     const { storedCredentials, setStoredCredentials } = useContext(CredentailsContext)
@@ -60,20 +62,6 @@ export default function AddMenu({ navigation }) {
         setDatePickerVisibility(false);
     }
 
-    const showDatePicker = () => {
-        setDatePickerVisibility(true);
-    }
-
-    const hideDatePicker = () => {
-        setDatePickerVisibility(false);
-    };
-
-    const warehouseOptions = [
-        { label: "Split", value: "Split" },
-        { label: "Dubrovnik", value: "Dubrovnik" },
-        { label: "Izdan", value: "Izdan" }
-    ];
-
     const quantityUnit = [
         { label: "Komada", value: "kom" },
         { label: "Metara", value: "m" },
@@ -89,31 +77,6 @@ export default function AddMenu({ navigation }) {
             .catch(error => console.log(error))
     }
 
-    const addDispenser = (credentials, setSubmitting) => {
-        handleMessage(null);
-        const url = "https://salty-river-31434.herokuapp.com/dispenser/addDispenser";
-
-        axios
-            .post(url, credentials)
-            .then((response) => {
-                const result = response.data;
-                const { message, status } = result;
-
-                if (status !== "SUCCESS") {
-                    handleMessage(message);
-                }
-                else {
-                    handleSuccessMessage(message);
-                }
-
-                setSubmitting(false);
-
-            })
-            .catch(err => {
-                setSubmitting(false);
-                handleMessage("Error, provijeri svoju internetsku vezu, pa pokusaj ponovo!");
-            })
-    }
 
     const addItem = (credentials, setSubmitting) => {
         const url = "https://salty-river-31434.herokuapp.com/part/addPart";
@@ -155,8 +118,8 @@ export default function AddMenu({ navigation }) {
             .post(url, credentials)
             .then((response) => {
                 const result = response.data;
-                const {message, status} = result;
-                
+                const { message, status } = result;
+
                 if (status !== "SUCCESS") {
                     handleMessage(message);
                 }
@@ -179,8 +142,8 @@ export default function AddMenu({ navigation }) {
             .post(url, credentials)
             .then((response) => {
                 const result = response.data;
-                const {message, status} = result;
-                
+                const { message, status } = result;
+
                 if (status !== "SUCCESS") {
                     handleMessage(message);
                 }
@@ -217,173 +180,7 @@ export default function AddMenu({ navigation }) {
                     </View>
                 </View >
                 {/* Modal for adding Dispensers */}
-                <Modal
-                    animationType="slide"
-                    transparent={true}
-                    visible={modalVisible}
-                    onRequestClose={() => {
-                        setModalVisible(!modalVisible);
-                        setMessage(null);
-                        setSuccessMessage(null);
-                    }}
-                >
-                    <KeyboardAvoidingWrapper>
-                        <View style={styles.centeredView}>
-                            <View style={styles.modalView}>
 
-                                <DateTimePickerModal
-                                    isVisible={isDatePickerVisible}
-                                    mode="date"
-                                    onConfirm={handleConfirm}
-                                    onCancel={hideDatePicker}
-                                    themeVariant=""
-                                />
-
-
-                                <Formik
-                                    initialValues={{
-                                        warehouse: "Split",
-                                        invNumber: "",
-                                        model: "",
-                                        location: {
-                                            region: "",
-                                            city: "",
-                                            address: ""
-                                        },
-                                        dateOfLastSanitation: "",
-                                        comment: ""
-                                    }}
-                                    onSubmit={(values, { setSubmitting }) => {
-                                        values = { ...values, dateOfLastSanitation: dols };
-                                        addDispenser(values, setSubmitting);
-                                    }}
-                                >
-                                    {
-                                        ({ handleChange, handleBlur, handleSubmit, setFieldValue, values, isSubmitting, handleReset }) => (
-                                            <View style={{ alignItems: "center" }}>
-                                                <Text style={{ color: "#fff", alignSelf: "center", marginBottom: hp(1), fontFamily: "Montserrat" }}>Odaberite Skladište</Text>
-                                                <SwitchSelector
-                                                    options={warehouseOptions}
-                                                    initial={0}
-                                                    onPress={value => {
-                                                        setFieldValue("warehouse", value);
-                                                    }}
-                                                    style={{ width: wp(80), marginBottom: hp(3) }}
-                                                    buttonColor="#ff0"
-                                                    selectedColor="#000"
-                                                    height={hp(3.5)}
-                                                />
-                                                <View style={styles.dispenserContainer}>
-                                                    <Input
-                                                        icon="clipboard"
-                                                        placeholder="Inventurni broj"
-                                                        placeholderTextColor="#888"
-                                                        onChangeText={handleChange("invNumber")}
-                                                        onBlur={handleBlur("invNumber")}
-                                                        value={values.invNumber}
-                                                        returnKeyType="next"
-                                                        keyboardType="numeric"
-                                                    />
-
-                                                    <Input
-                                                        icon="edit-3"
-                                                        placeholder="Model"
-                                                        placeholderTextColor="#888"
-                                                        onChangeText={handleChange("model")}
-                                                        onBlur={handleBlur("model")}
-                                                        value={values.model}
-                                                        returnKeyType="next"
-                                                    />
-
-                                                    <Input
-                                                        icon="globe"
-                                                        placeholder="Županija"
-                                                        placeholderTextColor="#888"
-                                                        onChangeText={handleChange("location.region")}
-                                                        onBlur={handleBlur("location.region")}
-                                                        value={values.location.region}
-                                                        returnKeyType="next"
-                                                    />
-
-                                                    <Input
-                                                        icon="target"
-                                                        placeholder="Grad"
-                                                        placeholderTextColor="#888"
-                                                        onChangeText={handleChange("location.city")}
-                                                        onBlur={handleBlur("location.city")}
-                                                        value={values.location.city}
-                                                        returnKeyType="next"
-                                                    />
-
-                                                    <Input
-                                                        icon="map-pin"
-                                                        placeholder="Adresa i mijesto"
-                                                        placeholderTextColor="#888"
-                                                        onChangeText={handleChange("location.address")}
-                                                        onBlur={handleBlur("location.address")}
-                                                        value={values.location.address}
-                                                        returnKeyType="next"
-                                                    />
-
-                                                    <Input
-                                                        icon="calendar"
-                                                        placeholder="Datum sanitacije"
-                                                        placeholderTextColor="#888"
-                                                        onChangeText={handleChange("dateOfLastSanitation")}
-                                                        onBlur={handleBlur("dateOfLastSanitation")}
-                                                        value={dols ? dols.toDateString() : ""}
-                                                        isDate={true}
-                                                        editable={false}
-                                                        showDatePicker={showDatePicker}
-                                                    />
-
-                                                    <Input
-                                                        icon="alert-circle"
-                                                        placeholder="Komentar"
-                                                        placeholderTextColor="#888"
-                                                        onChangeText={handleChange("comment")}
-                                                        onBlur={handleBlur("comment")}
-                                                        value={values.comment}
-                                                        returnKeyType="next"
-                                                    />
-
-                                                </View>
-
-                                                <MsgBox style={{ marginTop: hp(0.5) }}>{message}</MsgBox>
-                                                <SuccessMsgBox>{successMessage}</SuccessMsgBox>
-
-                                                {!isSubmitting ? (
-                                                    <SubmitButton style={{ marginTop: hp(1) }} onPress={handleSubmit}>
-                                                        <SubmitButtonText>submit</SubmitButtonText>
-                                                    </SubmitButton>
-                                                ) : (
-                                                    <SubmitButton disabled={true}>
-                                                        <ActivityIndicator size={hp(2.5)} color="#fff" />
-                                                    </SubmitButton>
-                                                )}
-
-                                            </View>
-                                        )
-                                    }
-                                </Formik>
-
-
-                                <TouchableOpacity
-                                    onPress={() => {
-                                        setModalVisible(false);
-                                        setDols("");
-                                        setSuccessMessage(null);
-                                        setMessage(null);
-                                    }}
-                                    style={{ marginVertical: hp(2) }}>
-                                    <Text style={{ color: "#fff" }}>Zatvori</Text>
-                                </TouchableOpacity>
-                            </View>
-                        </View>
-                    </KeyboardAvoidingWrapper>
-
-
-                </Modal>
 
                 {/* Modal for adding Parts */}
                 <Modal
@@ -688,41 +485,66 @@ export default function AddMenu({ navigation }) {
                         </View>
                     </KeyboardAvoidingWrapper>
                 </Modal>
-                
+
 
                 {/* Menu touchables */}
-                <View style={styles.menuContainer}>
-                    <View style={styles.iconView}>
-                        <TouchableOpacity onPress={() => setModalVisible(true)} style={styles.iconBox}>
-                            <MaterialCommunityIcons name="beer-outline" size={wp(9)} color={"#ff0"} />
-                        </TouchableOpacity>
-                        <Text style={{ fontFamily: "Montserrat" }}>Dodaj točionik</Text>
+                <View style={styles.touchablesContainer}>
+                    <View style={styles.iconLabel1}>
+                        <Text style={{ fontFamily: "Montserrat" }}>Dijelovi</Text>
+                    </View>
+                    <View style={styles.iconContainer}>
+                        <View style={styles.menuContainer}>
+                            <TouchableOpacity onPress={() => setModalPartsVisible(true)} style={styles.iconBox}>
+                                <MaterialCommunityIcons name="map-marker-plus-outline" size={wp(6)} color={"#ff0"} />
+                            </TouchableOpacity>
+                        </View>
+                        <View style={styles.menuContainer}>
+                            <TouchableOpacity onPress={() => setModalPartsVisible(true)} style={styles.iconBox}>
+                                <Feather name="folder-minus" size={wp(6)} color={"#ff0"} />
+                            </TouchableOpacity>
+                        </View>
+                    </View>
+                    <View style={styles.iconLabel}>
+                        <Text style={{ fontFamily: "Montserrat" }}>Prebaci sa sevisera na :</Text>
+                    </View>
+                    <View style={styles.iconContainer}>
+                        <View style={styles.menuContainer}>
+                            <TouchableOpacity onPress={() => setModalPartsVisible(true)} style={styles.iconBox}>
+                                <MaterialCommunityIcons name="map-marker-plus-outline" size={wp(6)} color={"#ff0"} />
+                            </TouchableOpacity>
+                        </View>
+                        <View style={styles.menuContainer}>
+                            <TouchableOpacity onPress={() => setModalPartsVisible(true)} style={styles.iconBox}>
+                                <Feather name="folder-minus" size={wp(6)} color={"#ff0"} />
+                            </TouchableOpacity>
+                        </View>
+                    </View>
+                    <View style={styles.iconLabel2}>
+                        <Text style={{ fontFamily: "Montserrat" }}>Točionici</Text>
                     </View>
                 </View>
-                <View style={styles.menuContainer}>
-                    <View style={styles.iconView}>
+                
+                <View style={styles.iconContainer}>
+                    <View style={styles.iconBottomLabel}>
+                        <Text style={{ fontFamily: "Montserrat" }}>S objekta na servisera</Text>
+                    </View>
+                    <View style={styles.iconBottomLabel}>
+                        <Text style={{ fontFamily: "Montserrat" }}>Serviser na Centralno</Text>
+                    </View>
+                </View>
+                <View style={styles.iconContainer}>
+                    <View style={styles.menuBottomContainer}>
                         <TouchableOpacity onPress={() => setModalPartsVisible(true)} style={styles.iconBox}>
-                            <Feather name="settings" size={wp(9)} color={"#ff0"} />
+                            <Feather name="user-plus" size={wp(6)} color={"#ff0"} />
                         </TouchableOpacity>
-                        <Text style={{ fontFamily: "Montserrat" }}>Dodaj dijelove</Text>
+                    </View>
+                    <View style={styles.menuBottomContainer}>
+                        <TouchableOpacity onPress={() => setModalPartsVisible(true)} style={styles.iconBox}>
+                            <Feather name="settings" size={wp(6)} color={"#ff0"} />
+                        </TouchableOpacity>
                     </View>
                 </View>
-                <View style={styles.menuContainer}>
-                    <View style={styles.iconView}>
-                        <TouchableOpacity onPress={() => setModalServicerVisible(true)} style={styles.iconBox}>
-                            <Feather name="user-plus" size={wp(9)} color={"#ff0"} />
-                        </TouchableOpacity>
-                        <Text style={{ fontFamily: "Montserrat" }}>Dodaj serviseru</Text>
-                    </View>
-                </View>
-                <View style={styles.menuContainer}>
-                    <View style={styles.iconView}>
-                        <TouchableOpacity onPress={() => setExpenseVisible(true)} style={styles.iconBox}>
-                            <Feather name="folder-minus" size={wp(9)} color={"#ff0"} />
-                        </TouchableOpacity>
-                        <Text style={{ fontFamily: "Montserrat" }}>Dodaj rashod</Text>
-                    </View>
-                </View>
+
 
                 {/* Bottom Navigator */}
                 <View style={styles.bottomViewMenu}>
@@ -736,10 +558,10 @@ export default function AddMenu({ navigation }) {
 
 
                     <TouchableOpacity onPress={() => navigation.navigate("AddMenu")} style={styles.iconBoxMenu}>
-                        <Feather name="plus" size={wp(5)} color={"yellow"} />
+                        <Feather name="plus" size={wp(5)} color={"#fff"} />
                     </TouchableOpacity>
-                    <TouchableOpacity onPress={() => navigation.navigate("Transfers")} style={styles.iconBoxMenu}>
-                        <Feather name="repeat" size={wp(5)} color={"#fff"} />
+                    <TouchableOpacity style={styles.iconBoxMenu}>
+                        <Feather name="repeat" size={wp(5)} color={"yellow"} />
                     </TouchableOpacity>
                 </View>
             </LinearGradient>
@@ -774,14 +596,76 @@ const styles = StyleSheet.create({
         justifyContent: "flex-start",
         alignItems: "center"
     },
-    menuContainer: {
+    touchablesContainer: {
+
+    },
+    iconContainer: {
         width: wp(80),
+        display: "flex",
+        flexDirection: "row",
+        justifyContent: "space-between"
+    },
+    menuContainer: {
+        display: "flex",
+        width: wp(38.5),
         alignItems: "center",
-        borderRadius: wp(10),
+        borderRadius: wp(1),
         marginBottom: hp(1),
-        justifyContent: "flex-start",
+        justifyContent: "center",
         backgroundColor: "rgba(250,250,250,0.5)",
-        flexDirection: "column",
+    },
+    menuBottomContainer: {
+        display: "flex",
+        width: wp(38.5),
+        alignItems: "center",
+        borderRadius: wp(1),
+        marginBottom: hp(1),
+        justifyContent: "center",
+        backgroundColor: "rgba(250,250,250,0.5)",
+        borderBottomRightRadius: 15,
+        borderBottomLeftRadius: 15
+    },
+    iconLabel: {
+        alignItems: "center",
+        borderRadius: wp(1),
+        marginBottom: hp(1),
+        backgroundColor: "rgba(250,250,250,0.5)",
+        paddingTop: hp(1),
+        paddingBottom: hp(1),
+        width: wp(80)
+    },
+    iconLabel1: {
+        alignItems: "center",
+        borderRadius: wp(1),
+        borderTopRightRadius: 15,
+        borderTopLeftRadius: 15,
+        marginBottom: hp(1),
+        backgroundColor: "rgba(250,250,250,0.5)",
+        paddingTop: hp(1),
+        paddingBottom: hp(1),
+        width: wp(80)
+    },
+    iconLabel2: {
+        alignItems: "center",
+        borderRadius: wp(1),
+        marginBottom: hp(1),
+        backgroundColor: "rgba(250,250,250,0.5)",
+        paddingTop: hp(1),
+        paddingBottom: hp(1),
+        width: wp(80),
+        borderBottomRightRadius: 15,
+        borderBottomLeftRadius: 15,
+    },
+    iconBottomLabel: {
+        alignItems: "center",
+        marginTop: hp(3),
+        marginBottom: hp(1),
+        backgroundColor: "rgba(250,250,250,0.5)",
+        paddingTop: hp(1),
+        paddingBottom: hp(1),
+        width: wp(38.5),
+        borderTopLeftRadius: 15,
+        borderTopRightRadius: 15
     },
     topView: {
         flexDirection: "row",
@@ -802,14 +686,14 @@ const styles = StyleSheet.create({
     },
     bottomViewMenu: {
         display: "flex",
-        position: "relative",
+        position: "absolute",
         alignItems: "center",
         borderRadius: wp(100),
         flexDirection: "row",
         justifyContent: "center",
         backgroundColor: "rgba(255,255,255, 0.5)",
         width: wp(80),
-        bottom: hp(-1)
+        bottom: hp(8)
     },
     profileLogo: {
         borderRadius: wp(100),
@@ -847,17 +731,14 @@ const styles = StyleSheet.create({
         alignItems: "center"
     },
     iconView: {
-        flexDirection: "row",
-        justifyContent: "space-around",
-        alignItems: "center",
+        marginLeft: "auto",
+        marginRight: "auto"
     },
     iconBox: {
-        margin: wp(5),
-        marginHorizontal: wp(0),
         padding: wp(7),
         borderRadius: wp(100),
         backgroundColor: "rgba(0,0,0,1)",
-        left: wp(-8)
+        marginVertical: hp(1.5)
     },
     iconBoxMenu: {
         margin: wp(3),

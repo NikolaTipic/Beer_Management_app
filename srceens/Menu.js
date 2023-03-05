@@ -209,7 +209,7 @@ const Menu = ({navigation}) => {
             <View style={styles.bottomView}>
                 
                     <TouchableOpacity style={styles.iconBox}>
-                        <Feather name="home" size={wp(5)} color={"rgba(255,255,0,0.5)"} />
+                        <Feather name="home" size={wp(5)} color={"yellow"} />
                     </TouchableOpacity>
                     <TouchableOpacity onPress={() => navigation.navigate("Inventory")} style={styles.iconBox}>
                         <Feather name="bar-chart-2" size={wp(5)} color={"#fff"}/>
