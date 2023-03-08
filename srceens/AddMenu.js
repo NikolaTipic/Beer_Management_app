@@ -736,7 +736,7 @@ export default function AddMenu({ navigation }) {
 
 
                     <TouchableOpacity onPress={() => navigation.navigate("AddMenu")} style={styles.iconBoxMenu}>
-                        <Feather name="plus" size={wp(5)} color={"yellow"} />
+                        <MaterialCommunityIcons name="database" size={wp(5)} color={"yellow"} />
                     </TouchableOpacity>
                     <TouchableOpacity onPress={() => navigation.navigate("Transfers")} style={styles.iconBoxMenu}>
                         <Feather name="repeat" size={wp(5)} color={"#fff"} />
