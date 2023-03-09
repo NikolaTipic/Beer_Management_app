@@ -273,10 +273,10 @@ const Inventory = ({ navigation }) => {
                         <Feather name="bar-chart-2" size={wp(5)} color={"yellow"} />
                     </TouchableOpacity>
                     <TouchableOpacity onPress={() => navigation.navigate("AddMenu")} style={styles.iconBox}>
-                        <Feather name="plus" size={wp(5)} color={"#fff"} />
+                        <MaterialCommunityIcons name="database" size={wp(5)} color={"#fff"} />
                     </TouchableOpacity>
-                    <TouchableOpacity style={styles.iconBox}>
-                        <Feather name="trash" size={wp(5)} color={"#fff"} />
+                    <TouchableOpacity onPress={() => navigation.navigate("Transfers")} style={styles.iconBox}>
+                        <Feather name="repeat" size={wp(5)} color={"#fff"} />
                     </TouchableOpacity>
 
                 </View>

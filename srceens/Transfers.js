@@ -136,6 +136,29 @@ export default function Transfers({ navigation }) {
             });
     }
 
+    const deleteFacility = (credentials, setSubmitting) => {
+        const url = "https://salty-river-31434.herokuapp.com/facility/deleteFacility"
+
+        axios
+            .post(url, credentials)
+            .then((response) => {
+                const result = response.data;
+                const { message, status } = result;
+
+                if (status !== "SUCCESS") {
+                    handleMessage(message);
+                }
+                else {
+                    handleSuccessMessage(message);
+                }
+
+                setSubmitting(false);
+            })
+            .catch(err => {
+                setSubmitting(false);
+                handleMessage("Error, provijeri svoju internetsku vezu, pa pokusaj ponovo!");
+            });
+    }
 
     const fromServicerToFacility = (credentials, setSubmitting) => {
         const url = "https://salty-river-31434.herokuapp.com/part/fromServicerToFacility"
@@ -210,6 +233,30 @@ export default function Transfers({ navigation }) {
             });
     }
 
+    const fromFacilityToServicer = (credentials, setSubmitting) => {
+        const url = "https://salty-river-31434.herokuapp.com/part/fromServicerToFacility"
+
+        axios
+            .post(url, credentials)
+            .then((response) => {
+                const result = response.data;
+                const { message, status } = result;
+
+                if (status !== "SUCCESS") {
+                    handleMessage(message);
+                }
+                else {
+                    handleSuccessMessage(message);
+                }
+
+                setSubmitting(false);
+            })
+            .catch(err => {
+                setSubmitting(false);
+                handleMessage("Error, provijeri svoju internetsku vezu, pa pokusaj ponovo!");
+            });
+    }
+
     return (
         <>
             <StatusBar style="dark" />
@@ -231,7 +278,7 @@ export default function Transfers({ navigation }) {
                     </View>
                 </View >
 
-                {/* Add Facilitie */}
+                {/*Modal Add Facilitie */}
                 <Modal
                     animationType="slide"
                     transparent={true}
@@ -341,7 +388,7 @@ export default function Transfers({ navigation }) {
                     </KeyboardAvoidingWrapper>
                 </Modal>
 
-                {/* from Servicer to Facility*/}
+                {/*Modal Remove Facilitie */}
                 <Modal
                     animationType="slide"
                     transparent={true}
@@ -353,13 +400,88 @@ export default function Transfers({ navigation }) {
                     }}
                 >
                     <KeyboardAvoidingWrapper>
-                        <View style={styles.centeredView3}>
-                            <View style={styles.modalView3}>
+                        <View style={styles.centeredView4}>
+                            <View style={styles.modalView4}>
+
+                                <Formik
+                                    initialValues={{
+                                        name: "",
+                                    }}
+                                    onSubmit={(values, { setSubmitting }) => {
+                                        values = { ...values };
+                                        deleteFacility(values, setSubmitting);
+                                    }}
+                                >
+                                    {
+                                        ({ handleChange, handleBlur, handleSubmit, setFieldValue, values, isSubmitting, handleReset }) => (
+                                            <View style={{ alignItems: "center" }}>
+                                                <View style={styles.dispenserContainer}>
+                                                    <Input
+                                                        icon="clipboard"
+                                                        placeholder="Ime objekta"
+                                                        placeholderTextColor="#888"
+                                                        onChangeText={handleChange("name")}
+                                                        onBlur={handleBlur("name")}
+                                                        value={values.name}
+                                                    />
+                                                </View>
+
+                                                <MsgBox style={{ marginTop: hp(0.5) }}>{message}</MsgBox>
+                                                <SuccessMsgBox>{successMessage}</SuccessMsgBox>
+
+                                                {!isSubmitting ? (
+                                                    <SubmitButton style={{ marginTop: hp(1) }} onPress={() => {
+                                                        handleSubmit();
+                                                        setSuccessMessage(null);
+                                                        setMessage(null);
+                                                    }}>
+                                                        <SubmitButtonText>submit</SubmitButtonText>
+                                                    </SubmitButton>
+                                                ) : (
+                                                    <SubmitButton disabled={true}>
+                                                        <ActivityIndicator size={hp(2.5)} color="#fff" />
+                                                    </SubmitButton>
+                                                )}
+
+                                            </View>
+                                        )
+                                    }
+                                </Formik>
+
+                                <TouchableOpacity
+                                    onPress={() => {
+                                        setSelected(null);
+                                        setSuccessMessage(null);
+                                        setMessage(null);
+                                    }}
+                                    style={{ marginVertical: hp(2) }}>
+                                    <Text style={{ color: "#fff" }}>Zatvori</Text>
+                                </TouchableOpacity>
+                            </View>
+                        </View>
+                    </KeyboardAvoidingWrapper>
+                </Modal>
+
+                {/* Modal from Servicer to Facility*/}
+                <Modal
+                    animationType="slide"
+                    transparent={true}
+                    visible={selected === 2}
+                    onRequestClose={() => {
+                        setSelected(null);
+                        setMessage(null);
+                        setSuccessMessage(null);
+                    }}
+                >
+                    <KeyboardAvoidingWrapper>
+                        <View style={styles.centeredView2}>
+                            <View style={styles.modalView2}>
 
                                 <Formik
                                     initialValues={{
                                         productCode: "",
                                         name: "",
+                                        facilityName: "",
                                         quantity: ""
                                     }}
                                     onSubmit={(values, { setSubmitting }) => {
@@ -391,6 +513,16 @@ export default function Transfers({ navigation }) {
                                                         onChangeText={handleChange("name")}
                                                         onBlur={handleBlur("name")}
                                                         value={values.name}
+                                                        returnKeyType="next"
+                                                    />
+
+                                                    <Input
+                                                        icon="clipboard"
+                                                        placeholder="Ime objekta"
+                                                        placeholderTextColor="#888"
+                                                        onChangeText={handleChange("facilityName")}
+                                                        onBlur={handleBlur("facilityName")}
+                                                        value={values.facilityName}
                                                         returnKeyType="next"
                                                     />
 
@@ -444,7 +576,7 @@ export default function Transfers({ navigation }) {
                 <Modal
                     animationType="slide"
                     transparent={true}
-                    visible={selected === 3}
+                    visible={selected === 4}
                     onRequestClose={() => {
                         setSelected(null);
                         setMessage(null);
@@ -544,7 +676,7 @@ export default function Transfers({ navigation }) {
                 <Modal
                     animationType="slide"
                     transparent={true}
-                    visible={selected === 2}
+                    visible={selected === 3}
                     onRequestClose={() => {
                         setSelected(null);
                         setMessage(null);
@@ -638,17 +770,133 @@ export default function Transfers({ navigation }) {
                     </KeyboardAvoidingWrapper>
                 </Modal>
 
+                {/* Modal from Facility to Servicer*/}
+                <Modal
+                    animationType="slide"
+                    transparent={true}
+                    visible={selected === 8}
+                    onRequestClose={() => {
+                        setSelected(null);
+                        setMessage(null);
+                        setSuccessMessage(null);
+                    }}
+                >
+                    <KeyboardAvoidingWrapper>
+                        <View style={styles.centeredView2}>
+                            <View style={styles.modalView2}>
+
+                                <Formik
+                                    initialValues={{
+                                        productCode: "",
+                                        name: "",
+                                        facilityName: "",
+                                        quantity: ""
+                                    }}
+                                    onSubmit={(values, { setSubmitting }) => {
+                                        values = { ...values };
+                                        fromFacilityToServicer(values, setSubmitting);
+                                        setMessage(null);
+                                        setSuccessMessage(null);
+                                    }}
+                                >
+                                    {
+                                        ({ handleChange, handleBlur, handleSubmit, setFieldValue, values, isSubmitting, handleReset }) => (
+                                            <View style={{ alignItems: "center" }}>
+
+                                                <View style={styles.dispenserContainer}>
+                                                    <Input
+                                                        icon="hash"
+                                                        placeholder="Šifra proizvoda"
+                                                        placeholderTextColor="#888"
+                                                        onChangeText={handleChange("productCode")}
+                                                        onBlur={handleBlur("productCode")}
+                                                        value={values.productCode}
+                                                        enterKeyHint="next"
+                                                    />
+
+                                                    <Input
+                                                        icon="clipboard"
+                                                        placeholder="Ime objekta"
+                                                        placeholderTextColor="#888"
+                                                        onChangeText={handleChange("facilityName")}
+                                                        onBlur={handleBlur("facilityName")}
+                                                        value={values.facilityName}
+                                                        returnKeyType="next"
+                                                    />
+
+                                                    <Input
+                                                        icon="user"
+                                                        placeholder="Ime servisera"
+                                                        placeholderTextColor="#888"
+                                                        onChangeText={handleChange("name")}
+                                                        onBlur={handleBlur("name")}
+                                                        value={values.name}
+                                                        returnKeyType="next"
+                                                    />
+
+                                                    <Input
+                                                        icon="plus"
+                                                        placeholder="Količina"
+                                                        placeholderTextColor="#888"
+                                                        onChangeText={handleChange("quantity")}
+                                                        onBlur={handleBlur("quantity")}
+                                                        value={values.quantity}
+                                                        returnKeyType="next"
+                                                        keyboardType="numeric"
+                                                    />
+                                                </View>
+
+                                                <MsgBox style={{ marginTop: hp(0.5) }}>{message}</MsgBox>
+                                                <SuccessMsgBox>{successMessage}</SuccessMsgBox>
+
+                                                {!isSubmitting ? (
+                                                    <SubmitButton style={{ marginTop: hp(1) }} onPress={handleSubmit}>
+                                                        <SubmitButtonText>submit</SubmitButtonText>
+                                                    </SubmitButton>
+                                                ) : (
+                                                    <SubmitButton disabled={true}>
+                                                        <ActivityIndicator size={hp(2.5)} color="#fff" />
+                                                    </SubmitButton>
+                                                )}
+
+                                            </View>
+                                        )
+                                    }
+                                </Formik>
+
+                                <TouchableOpacity
+                                    onPress={() => {
+                                        setSelected(null);
+                                        setSuccessMessage(null);
+                                        setMessage(null);
+                                    }}
+                                    style={{ marginVertical: hp(2) }}>
+                                    <Text style={{ color: "#fff" }}>Zatvori</Text>
+                                </TouchableOpacity>
+                            </View>
+                        </View>
+                    </KeyboardAvoidingWrapper>
+                </Modal>
 
                 {/* Menu touchables */}
-                <View style={styles.iconContainer}>
-                    <View style={styles.iconBottomLabel}>
-                        <Text style={{ fontFamily: "Montserrat" }}>Dodaj Objekt</Text>
+                <View style={styles.touchablesContainer}>
+                    <View style={styles.iconContainer}>
+                        <View style={styles.iconBottomLabel}>
+                            <Text style={{ fontFamily: "Montserrat" }}>Dodaj/Izbriši Objekt</Text>
+                        </View>
                     </View>
-                </View>
-                <View style={styles.addFacIconContainer}>
-                    <TouchableOpacity onPress={() => setSelected(0)} style={styles.iconBox}>
-                        <MaterialCommunityIcons name="domain-plus" size={wp(5)} color={"#ff0"} />
-                    </TouchableOpacity>
+                    <View style={styles.iconContainer}>
+                        <View style={styles.menuBottomContainerLeft}>
+                            <TouchableOpacity onPress={() => setSelected(0)} style={styles.iconBox}>
+                                <MaterialCommunityIcons name="domain-plus" size={wp(5)} color={"#ff0"} />
+                            </TouchableOpacity>
+                        </View>
+                        <View style={styles.menuBottomContainerRight}>
+                            <TouchableOpacity onPress={() => setSelected(1)} style={styles.iconBox}>
+                                <MaterialCommunityIcons name="domain-remove" size={wp(5)} color={"#ff0"} />
+                            </TouchableOpacity>
+                        </View>
+                    </View>
                 </View>
 
                 <View style={styles.touchablesContainer}>
@@ -657,17 +905,17 @@ export default function Transfers({ navigation }) {
                     </View>
                     <View style={styles.iconContainer}>
                         <View style={styles.menuContainer}>
-                            <TouchableOpacity onPress={() => setSelected(1)} style={styles.iconBox}>
+                            <TouchableOpacity onPress={() => setSelected(2)} style={styles.iconBox}>
                                 <MaterialCommunityIcons name="map-marker-plus-outline" size={wp(5)} color={"#ff0"} />
                             </TouchableOpacity>
                         </View>
                         <View style={styles.menuContainer}>
-                            <TouchableOpacity onPress={() => setSelected(2)} style={styles.iconBox}>
+                            <TouchableOpacity onPress={() => setSelected(3)} style={styles.iconBox}>
                                 <Feather name="folder-minus" size={wp(5)} color={"#ff0"} />
                             </TouchableOpacity>
                         </View>
                         <View style={styles.menuContainer}>
-                            <TouchableOpacity onPress={() => setSelected(3)} style={styles.iconBox}>
+                            <TouchableOpacity onPress={() => setSelected(4)} style={styles.iconBox}>
                                 <MaterialCommunityIcons name="database-plus" size={wp(5)} color={"#ff0"} />
                             </TouchableOpacity>
                         </View>
@@ -704,7 +952,7 @@ export default function Transfers({ navigation }) {
                 </View>
                 <View style={styles.iconContainer}>
                     <View style={styles.menuBottomContainerLeft}>
-                        <TouchableOpacity onPress={() => setModalPartsVisible(true)} style={styles.iconBox}>
+                        <TouchableOpacity onPress={() => setSelected(8)} style={styles.iconBox}>
                             <Feather name="settings" size={wp(5)} color={"#ff0"} />
                         </TouchableOpacity>
                     </View>
@@ -761,25 +1009,13 @@ const styles = StyleSheet.create({
         alignItems: "center"
     },
     touchablesContainer: {
-        marginBottom: hp(2)
+        marginBottom: hp(1.3)
     },
     iconContainer: {
         width: wp(80),
         display: "flex",
         flexDirection: "row",
         justifyContent: "space-between"
-    },
-    addFacIconContainer: {
-        display: "flex",
-        width: wp(80),
-        alignItems: "center",
-        borderRadius: wp(1),
-        marginBottom: hp(1),
-        justifyContent: "center",
-        backgroundColor: "rgba(250,250,250,0.5)",
-        borderBottomLeftRadius: 20,
-        borderBottomRightRadius: 20,
-        marginBottom: hp(3)
     },
     menuContainer: {
         display: "flex",
@@ -871,14 +1107,14 @@ const styles = StyleSheet.create({
     },
     bottomViewMenu: {
         display: "flex",
-        position: "absolute",
+        position: "relative",
         alignItems: "center",
         borderRadius: wp(100),
         flexDirection: "row",
         justifyContent: "center",
         backgroundColor: "rgba(255,255,255, 0.5)",
         width: wp(80),
-        bottom: hp(8)
+        bottom: hp(-4)
     },
     profileLogo: {
         borderRadius: wp(100),
