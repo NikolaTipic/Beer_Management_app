@@ -112,8 +112,8 @@ export default function Transfers({ navigation }) {
         setSuccessMessage(message)
     }
 
-    const addFacilite = (credentials, setSubmitting) => {
-        const url = "https://salty-river-31434.herokuapp.com/part/addFacilite"
+    const addFacility = (credentials, setSubmitting) => {
+        const url = "https://salty-river-31434.herokuapp.com/facility/addFacility"
 
         axios
             .post(url, credentials)
@@ -257,7 +257,7 @@ export default function Transfers({ navigation }) {
                                     }}
                                     onSubmit={(values, { setSubmitting }) => {
                                         values = { ...values };
-                                        addFacilite(values, setSubmitting);
+                                        addFacility(values, setSubmitting);
                                     }}
                                 >
                                     {
@@ -309,7 +309,11 @@ export default function Transfers({ navigation }) {
                                                 <SuccessMsgBox>{successMessage}</SuccessMsgBox>
 
                                                 {!isSubmitting ? (
-                                                    <SubmitButton style={{ marginTop: hp(1) }} onPress={handleSubmit}>
+                                                    <SubmitButton style={{ marginTop: hp(1) }} onPress={() => {
+                                                        handleSubmit();
+                                                        setSuccessMessage(null);
+                                                        setMessage(null);
+                                                    }}>
                                                         <SubmitButtonText>submit</SubmitButtonText>
                                                     </SubmitButton>
                                                 ) : (
