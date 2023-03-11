@@ -234,7 +234,7 @@ export default function Transfers({ navigation }) {
     }
 
     const fromFacilityToServicer = (credentials, setSubmitting) => {
-        const url = "https://salty-river-31434.herokuapp.com/part/fromServicerToFacility"
+        const url = "https://salty-river-31434.herokuapp.com/facility/fromFacilityToServicer"
 
         axios
             .post(url, credentials)
@@ -295,6 +295,7 @@ export default function Transfers({ navigation }) {
 
                                 <Formik
                                     initialValues={{
+                                        id: "",
                                         name: "",
                                         location: {
                                             city: "",
@@ -311,6 +312,17 @@ export default function Transfers({ navigation }) {
                                         ({ handleChange, handleBlur, handleSubmit, setFieldValue, values, isSubmitting, handleReset }) => (
                                             <View style={{ alignItems: "center" }}>
                                                 <View style={styles.dispenserContainer}>
+                                                    <Input
+                                                        icon="hash"
+                                                        placeholder="Id objekta"
+                                                        placeholderTextColor="#888"
+                                                        onChangeText={handleChange("id")}
+                                                        onBlur={handleBlur("id")}
+                                                        value={values.id}
+                                                        keyboardType="numeric"
+                                                        returnKeyType="next"
+                                                    />
+
                                                     <Input
                                                         icon="clipboard"
                                                         placeholder="Ime objekta"
@@ -333,7 +345,7 @@ export default function Transfers({ navigation }) {
 
                                                     <Input
                                                         icon="map-pin"
-                                                        placeholder="Adresa i mijesto"
+                                                        placeholder="Adresa"
                                                         placeholderTextColor="#888"
                                                         onChangeText={handleChange("location.address")}
                                                         onBlur={handleBlur("location.address")}
@@ -405,7 +417,7 @@ export default function Transfers({ navigation }) {
 
                                 <Formik
                                     initialValues={{
-                                        name: "",
+                                        id: "",
                                     }}
                                     onSubmit={(values, { setSubmitting }) => {
                                         values = { ...values };
@@ -418,11 +430,12 @@ export default function Transfers({ navigation }) {
                                                 <View style={styles.dispenserContainer}>
                                                     <Input
                                                         icon="clipboard"
-                                                        placeholder="Ime objekta"
+                                                        placeholder="ID objekta"
                                                         placeholderTextColor="#888"
-                                                        onChangeText={handleChange("name")}
-                                                        onBlur={handleBlur("name")}
-                                                        value={values.name}
+                                                        onChangeText={handleChange("id")}
+                                                        onBlur={handleBlur("id")}
+                                                        value={values.id}
+                                                        keyboardType="numeric"
                                                     />
                                                 </View>
 
@@ -1187,7 +1200,7 @@ const styles = StyleSheet.create({
 
     centeredView2: {
         position: "relative",
-        marginTop: hp(40)
+        marginTop: hp(35)
     },
 
     modalView2: {
@@ -1199,7 +1212,7 @@ const styles = StyleSheet.create({
         shadowColor: "#000",
         elevation: 0,
         width: wp(100),
-        height: hp(51)
+        height: hp(56)
     },
 
     centeredView3: {
