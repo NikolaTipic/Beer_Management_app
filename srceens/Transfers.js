@@ -494,7 +494,7 @@ export default function Transfers({ navigation }) {
                                     initialValues={{
                                         productCode: "",
                                         name: "",
-                                        facilityName: "",
+                                        id: "",
                                         quantity: ""
                                     }}
                                     onSubmit={(values, { setSubmitting }) => {
@@ -530,13 +530,14 @@ export default function Transfers({ navigation }) {
                                                     />
 
                                                     <Input
-                                                        icon="clipboard"
-                                                        placeholder="Ime objekta"
+                                                        icon="hash"
+                                                        placeholder="ID objekta"
                                                         placeholderTextColor="#888"
-                                                        onChangeText={handleChange("facilityName")}
-                                                        onBlur={handleBlur("facilityName")}
-                                                        value={values.facilityName}
+                                                        onChangeText={handleChange("id")}
+                                                        onBlur={handleBlur("id")}
+                                                        value={values.id}
                                                         returnKeyType="next"
+                                                        keyboardType="numeric"
                                                     />
 
                                                     <Input
@@ -801,8 +802,8 @@ export default function Transfers({ navigation }) {
                                 <Formik
                                     initialValues={{
                                         productCode: "",
+                                        id: "",
                                         name: "",
-                                        facilityName: "",
                                         quantity: ""
                                     }}
                                     onSubmit={(values, { setSubmitting }) => {
@@ -828,13 +829,14 @@ export default function Transfers({ navigation }) {
                                                     />
 
                                                     <Input
-                                                        icon="clipboard"
-                                                        placeholder="Ime objekta"
+                                                        icon="hash"
+                                                        placeholder="ID objekta"
                                                         placeholderTextColor="#888"
-                                                        onChangeText={handleChange("facilityName")}
-                                                        onBlur={handleBlur("facilityName")}
-                                                        value={values.facilityName}
+                                                        onChangeText={handleChange("id")}
+                                                        onBlur={handleBlur("id")}
+                                                        value={values.id}
                                                         returnKeyType="next"
+                                                        keyboardType="numeric"
                                                     />
 
                                                     <Input

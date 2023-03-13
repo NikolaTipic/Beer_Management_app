@@ -68,10 +68,9 @@ export default function AddMenu({ navigation }) {
         setDatePickerVisibility(false);
     };
 
-    const warehouseOptions = [
-        { label: "Split", value: "Split" },
-        { label: "Dubrovnik", value: "Dubrovnik" },
-        { label: "Izdan", value: "Izdan" }
+    const statusOptions = [
+        { label: "Aktivan", value: "active" },
+        { label: "Neaktivan", value: "inactive" },
     ];
 
     const quantityUnit = [
@@ -155,8 +154,8 @@ export default function AddMenu({ navigation }) {
             .post(url, credentials)
             .then((response) => {
                 const result = response.data;
-                const {message, status} = result;
-                
+                const { message, status } = result;
+
                 if (status !== "SUCCESS") {
                     handleMessage(message);
                 }
@@ -179,8 +178,8 @@ export default function AddMenu({ navigation }) {
             .post(url, credentials)
             .then((response) => {
                 const result = response.data;
-                const {message, status} = result;
-                
+                const { message, status } = result;
+
                 if (status !== "SUCCESS") {
                     handleMessage(message);
                 }
@@ -242,38 +241,46 @@ export default function AddMenu({ navigation }) {
 
                                 <Formik
                                     initialValues={{
-                                        warehouse: "Split",
+                                        status: "active",
+                                        serialNum: "",
                                         invNumber: "",
                                         model: "",
-                                        location: {
-                                            region: "",
-                                            city: "",
-                                            address: ""
-                                        },
                                         dateOfLastSanitation: "",
                                         comment: ""
                                     }}
                                     onSubmit={(values, { setSubmitting }) => {
                                         values = { ...values, dateOfLastSanitation: dols };
-                                        addDispenser(values, setSubmitting);
+                                        console.log(values);
+                                        //addDispenser(values, setSubmitting);
                                     }}
                                 >
                                     {
                                         ({ handleChange, handleBlur, handleSubmit, setFieldValue, values, isSubmitting, handleReset }) => (
                                             <View style={{ alignItems: "center" }}>
-                                                <Text style={{ color: "#fff", alignSelf: "center", marginBottom: hp(1), fontFamily: "Montserrat" }}>Odaberite Skladište</Text>
+                                                <Text style={{ color: "#fff", alignSelf: "center", marginBottom: hp(1), fontFamily: "Montserrat" }}>Status opreme</Text>
                                                 <SwitchSelector
-                                                    options={warehouseOptions}
+                                                    options={statusOptions}
                                                     initial={0}
                                                     onPress={value => {
-                                                        setFieldValue("warehouse", value);
+                                                        setFieldValue("status", value);
                                                     }}
                                                     style={{ width: wp(80), marginBottom: hp(3) }}
                                                     buttonColor="#ff0"
                                                     selectedColor="#000"
                                                     height={hp(3.5)}
                                                 />
+
                                                 <View style={styles.dispenserContainer}>
+                                                    <Input
+                                                        icon="hash"
+                                                        placeholder="Serijski broj"
+                                                        placeholderTextColor="#888"
+                                                        onChangeText={handleChange("serialNum")}
+                                                        onBlur={handleBlur("serialNum")}
+                                                        value={values.serialNum}
+                                                        returnKeyType="next"
+                                                    />
+
                                                     <Input
                                                         icon="clipboard"
                                                         placeholder="Inventurni broj"
@@ -282,7 +289,6 @@ export default function AddMenu({ navigation }) {
                                                         onBlur={handleBlur("invNumber")}
                                                         value={values.invNumber}
                                                         returnKeyType="next"
-                                                        keyboardType="numeric"
                                                     />
 
                                                     <Input
@@ -292,36 +298,6 @@ export default function AddMenu({ navigation }) {
                                                         onChangeText={handleChange("model")}
                                                         onBlur={handleBlur("model")}
                                                         value={values.model}
-                                                        returnKeyType="next"
-                                                    />
-
-                                                    <Input
-                                                        icon="globe"
-                                                        placeholder="Županija"
-                                                        placeholderTextColor="#888"
-                                                        onChangeText={handleChange("location.region")}
-                                                        onBlur={handleBlur("location.region")}
-                                                        value={values.location.region}
-                                                        returnKeyType="next"
-                                                    />
-
-                                                    <Input
-                                                        icon="target"
-                                                        placeholder="Grad"
-                                                        placeholderTextColor="#888"
-                                                        onChangeText={handleChange("location.city")}
-                                                        onBlur={handleBlur("location.city")}
-                                                        value={values.location.city}
-                                                        returnKeyType="next"
-                                                    />
-
-                                                    <Input
-                                                        icon="map-pin"
-                                                        placeholder="Adresa i mijesto"
-                                                        placeholderTextColor="#888"
-                                                        onChangeText={handleChange("location.address")}
-                                                        onBlur={handleBlur("location.address")}
-                                                        value={values.location.address}
                                                         returnKeyType="next"
                                                     />
 
@@ -688,7 +664,7 @@ export default function AddMenu({ navigation }) {
                         </View>
                     </KeyboardAvoidingWrapper>
                 </Modal>
-                
+
 
                 {/* Menu touchables */}
                 <View style={styles.menuContainer}>
