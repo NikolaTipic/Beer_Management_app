@@ -64,10 +64,9 @@ export default function Transfers({ navigation }) {
         setDatePickerVisibility(false);
     }
 
-    const quantityUnit = [
-        { label: "Komada", value: "kom" },
-        { label: "Metara", value: "m" },
-        { label: "Litara", value: "l" }
+    const status = [
+        { label: "Aktivan", value: "active" },
+        { label: "Neaktivan", value: "inactive" }
     ];
 
     const clearLogin = () => {
@@ -233,7 +232,55 @@ export default function Transfers({ navigation }) {
             });
     }
 
+    const dispensersFromServicerToFacility = (credentials, setSubmitting) => {
+        const url = "https://salty-river-31434.herokuapp.com/dispenser/dispenserFromServicerToFacility"
+
+        axios
+            .post(url, credentials)
+            .then((response) => {
+                const result = response.data;
+                const { message, status } = result;
+
+                if (status !== "SUCCESS") {
+                    handleMessage(message);
+                }
+                else {
+                    handleSuccessMessage(message);
+                }
+
+                setSubmitting(false);
+            })
+            .catch(err => {
+                setSubmitting(false);
+                handleMessage("Error, provijeri svoju internetsku vezu, pa pokusaj ponovo!");
+            });
+    }
+
     const fromFacilityToServicer = (credentials, setSubmitting) => {
+        const url = "https://salty-river-31434.herokuapp.com/facility/fromFacilityToServicer"
+
+        axios
+            .post(url, credentials)
+            .then((response) => {
+                const result = response.data;
+                const { message, status } = result;
+
+                if (status !== "SUCCESS") {
+                    handleMessage(message);
+                }
+                else {
+                    handleSuccessMessage(message);
+                }
+
+                setSubmitting(false);
+            })
+            .catch(err => {
+                setSubmitting(false);
+                handleMessage("Error, provijeri svoju internetsku vezu, pa pokusaj ponovo!");
+            });
+    }
+
+    const dispenserFromFacilityToServicer = (credentials, setSubmitting) => {
         const url = "https://salty-river-31434.herokuapp.com/facility/fromFacilityToServicer"
 
         axios
@@ -475,7 +522,7 @@ export default function Transfers({ navigation }) {
                     </KeyboardAvoidingWrapper>
                 </Modal>
 
-                {/* Modal from Servicer to Facility*/}
+                {/* Modal parts from Servicer to Facility*/}
                 <Modal
                     animationType="slide"
                     transparent={true}
@@ -586,7 +633,119 @@ export default function Transfers({ navigation }) {
                     </KeyboardAvoidingWrapper>
                 </Modal>
 
-                {/* Modal from Servicer to Central Storage*/}
+                {/* Modal dispensers from Servicer to Facility*/}
+                <Modal
+                    animationType="slide"
+                    transparent={true}
+                    visible={selected === 5}
+                    onRequestClose={() => {
+                        setSelected(null);
+                        setMessage(null);
+                        setSuccessMessage(null);
+                    }}
+                >
+                    <KeyboardAvoidingWrapper>
+                        <View style={styles.centeredView2}>
+                            <View style={styles.modalView2}>
+
+                                <Formik
+                                    initialValues={{
+                                        name: "",
+                                        invNumber: "",
+                                        id: "",
+                                        status: "active"
+                                    }}
+                                    onSubmit={(values, { setSubmitting }) => {
+                                        values = { ...values };
+                                        dispensersFromServicerToFacility(values, setSubmitting);
+                                        setMessage(null);
+                                        setSuccessMessage(null);
+                                    }}
+                                >
+                                    {
+                                        ({ handleChange, handleBlur, handleSubmit, setFieldValue, values, isSubmitting, handleReset }) => (
+                                            <View style={{ alignItems: "center" }}>
+
+                                                <View style={styles.dispenserContainer}>
+                                                    <Input
+                                                        icon="user"
+                                                        placeholder="Ime servisera"
+                                                        placeholderTextColor="#888"
+                                                        onChangeText={handleChange("name")}
+                                                        onBlur={handleBlur("name")}
+                                                        value={values.name}
+                                                        returnKeyType="next"
+                                                    />
+
+                                                    <Input
+                                                        icon="clipboard"
+                                                        placeholder="Inventurni broj"
+                                                        placeholderTextColor="#888"
+                                                        onChangeText={handleChange("invNumber")}
+                                                        onBlur={handleBlur("invNumber")}
+                                                        value={values.invNumber}
+                                                        enterKeyHint="next"
+                                                    />
+
+                                                    <Input
+                                                        icon="hash"
+                                                        placeholder="ID objekta"
+                                                        placeholderTextColor="#888"
+                                                        onChangeText={handleChange("id")}
+                                                        onBlur={handleBlur("id")}
+                                                        value={values.id}
+                                                        returnKeyType="next"
+                                                        keyboardType="numeric"
+                                                    />
+
+                                                    <Text style={{ color: "#fff", alignSelf: "center", marginBottom: hp(1), fontFamily: "Montserrat" }}>Status opreme</Text>
+                                                    <SwitchSelector
+                                                        options={status}
+                                                        initial={0}
+                                                        onPress={value => {
+                                                            setFieldValue("status", value);
+                                                        }}
+                                                        style={{ width: wp(80), marginBottom: hp(3) }}
+                                                        buttonColor="#ff0"
+                                                        selectedColor="#000"
+                                                        height={hp(3.5)}
+                                                    />
+
+                                                </View>
+
+                                                <MsgBox style={{ marginTop: hp(0.5) }}>{message}</MsgBox>
+                                                <SuccessMsgBox>{successMessage}</SuccessMsgBox>
+
+                                                {!isSubmitting ? (
+                                                    <SubmitButton style={{ marginTop: hp(1) }} onPress={handleSubmit}>
+                                                        <SubmitButtonText>submit</SubmitButtonText>
+                                                    </SubmitButton>
+                                                ) : (
+                                                    <SubmitButton disabled={true}>
+                                                        <ActivityIndicator size={hp(2.5)} color="#fff" />
+                                                    </SubmitButton>
+                                                )}
+
+                                            </View>
+                                        )
+                                    }
+                                </Formik>
+
+                                <TouchableOpacity
+                                    onPress={() => {
+                                        setSelected(null);
+                                        setSuccessMessage(null);
+                                        setMessage(null);
+                                    }}
+                                    style={{ marginVertical: hp(2) }}>
+                                    <Text style={{ color: "#fff" }}>Zatvori</Text>
+                                </TouchableOpacity>
+                            </View>
+                        </View>
+                    </KeyboardAvoidingWrapper>
+                </Modal>
+
+                {/* Modal parts - from Servicer to Central Storage*/}
                 <Modal
                     animationType="slide"
                     transparent={true}
@@ -686,7 +845,7 @@ export default function Transfers({ navigation }) {
                     </KeyboardAvoidingWrapper>
                 </Modal>
 
-                {/* Modal from Servicer to Expense */}
+                {/* Modal parts - from Servicer to Expense */}
                 <Modal
                     animationType="slide"
                     transparent={true}
@@ -784,7 +943,7 @@ export default function Transfers({ navigation }) {
                     </KeyboardAvoidingWrapper>
                 </Modal>
 
-                {/* Modal from Facility to Servicer*/}
+                {/* Modal parts - from Facility to Servicer*/}
                 <Modal
                     animationType="slide"
                     transparent={true}
@@ -893,6 +1052,103 @@ export default function Transfers({ navigation }) {
                     </KeyboardAvoidingWrapper>
                 </Modal>
 
+                {/* Modal dispenser - from Facility to Servicer*/}
+                <Modal
+                    animationType="slide"
+                    transparent={true}
+                    visible={selected === 9}
+                    onRequestClose={() => {
+                        setSelected(null);
+                        setMessage(null);
+                        setSuccessMessage(null);
+                    }}
+                >
+                    <KeyboardAvoidingWrapper>
+                        <View style={styles.centeredView2}>
+                            <View style={styles.modalView2}>
+
+                                <Formik
+                                    initialValues={{
+                                        id: "",
+                                        name: "",
+                                        invNumber: ""
+                                    }}
+                                    onSubmit={(values, { setSubmitting }) => {
+                                        values = { ...values };
+                                        dispenserFromFacilityToServicer(values, setSubmitting);
+                                        setMessage(null);
+                                        setSuccessMessage(null);
+                                    }}
+                                >
+                                    {
+                                        ({ handleChange, handleBlur, handleSubmit, setFieldValue, values, isSubmitting, handleReset }) => (
+                                            <View style={{ alignItems: "center" }}>
+
+                                                <View style={styles.dispenserContainer}>
+                                                    <Input
+                                                        icon="hash"
+                                                        placeholder="ID objekta"
+                                                        placeholderTextColor="#888"
+                                                        onChangeText={handleChange("id")}
+                                                        onBlur={handleBlur("id")}
+                                                        value={values.id}
+                                                        returnKeyType="next"
+                                                        keyboardType="numeric"
+                                                    />
+
+                                                    <Input
+                                                        icon="user"
+                                                        placeholder="Ime servisera"
+                                                        placeholderTextColor="#888"
+                                                        onChangeText={handleChange("name")}
+                                                        onBlur={handleBlur("name")}
+                                                        value={values.name}
+                                                        returnKeyType="next"
+                                                    />
+
+                                                    <Input
+                                                        icon="clipboard"
+                                                        placeholder="Inventurni broj"
+                                                        placeholderTextColor="#888"
+                                                        onChangeText={handleChange("invNumber")}
+                                                        onBlur={handleBlur("invNumber")}
+                                                        value={values.invNumber}
+                                                        returnKeyType="next"
+                                                    />
+                                                </View>
+
+                                                <MsgBox style={{ marginTop: hp(0.5) }}>{message}</MsgBox>
+                                                <SuccessMsgBox>{successMessage}</SuccessMsgBox>
+
+                                                {!isSubmitting ? (
+                                                    <SubmitButton style={{ marginTop: hp(1) }} onPress={handleSubmit}>
+                                                        <SubmitButtonText>submit</SubmitButtonText>
+                                                    </SubmitButton>
+                                                ) : (
+                                                    <SubmitButton disabled={true}>
+                                                        <ActivityIndicator size={hp(2.5)} color="#fff" />
+                                                    </SubmitButton>
+                                                )}
+
+                                            </View>
+                                        )
+                                    }
+                                </Formik>
+
+                                <TouchableOpacity
+                                    onPress={() => {
+                                        setSelected(null);
+                                        setSuccessMessage(null);
+                                        setMessage(null);
+                                    }}
+                                    style={{ marginVertical: hp(2) }}>
+                                    <Text style={{ color: "#fff" }}>Zatvori</Text>
+                                </TouchableOpacity>
+                            </View>
+                        </View>
+                    </KeyboardAvoidingWrapper>
+                </Modal>
+
                 {/* Menu touchables */}
                 <View style={styles.touchablesContainer}>
                     <View style={styles.iconContainer}>
@@ -940,17 +1196,17 @@ export default function Transfers({ navigation }) {
                     </View>
                     <View style={styles.iconContainer}>
                         <View style={styles.menuContainer}>
-                            <TouchableOpacity onPress={() => setModalPartsVisible(true)} style={styles.iconBox}>
+                            <TouchableOpacity onPress={() => setSelected(5)} style={styles.iconBox}>
                                 <MaterialCommunityIcons name="map-marker-plus-outline" size={wp(5)} color={"#ff0"} />
                             </TouchableOpacity>
                         </View>
                         <View style={styles.menuContainer}>
-                            <TouchableOpacity onPress={() => setModalPartsVisible(true)} style={styles.iconBox}>
+                            <TouchableOpacity onPress={() => setSelected(6)} style={styles.iconBox}>
                                 <Feather name="folder-minus" size={wp(5)} color={"#ff0"} />
                             </TouchableOpacity>
                         </View>
                         <View style={styles.menuContainer}>
-                            <TouchableOpacity onPress={() => setModalPartsVisible(true)} style={styles.iconBox}>
+                            <TouchableOpacity onPress={() => setSelected(7)} style={styles.iconBox}>
                                 <MaterialCommunityIcons name="database-plus" size={wp(5)} color={"#ff0"} />
                             </TouchableOpacity>
                         </View>
@@ -973,7 +1229,7 @@ export default function Transfers({ navigation }) {
                     </View>
 
                     <View style={styles.menuBottomContainerRight}>
-                        <TouchableOpacity onPress={() => setModalPartsVisible(true)} style={styles.iconBox}>
+                        <TouchableOpacity onPress={() => setSelected(9)} style={styles.iconBox}>
                             <MaterialCommunityIcons name="beer-outline" size={wp(5)} color={"#ff0"} />
                         </TouchableOpacity>
                     </View>
