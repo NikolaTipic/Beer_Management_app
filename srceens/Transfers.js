@@ -281,7 +281,55 @@ export default function Transfers({ navigation }) {
     }
 
     const dispenserFromFacilityToServicer = (credentials, setSubmitting) => {
-        const url = "https://salty-river-31434.herokuapp.com/facility/fromFacilityToServicer"
+        const url = "https://salty-river-31434.herokuapp.com/facility/dispenserFromFacilityToServicer"
+
+        axios
+            .post(url, credentials)
+            .then((response) => {
+                const result = response.data;
+                const { message, status } = result;
+
+                if (status !== "SUCCESS") {
+                    handleMessage(message);
+                }
+                else {
+                    handleSuccessMessage(message);
+                }
+
+                setSubmitting(false);
+            })
+            .catch(err => {
+                setSubmitting(false);
+                handleMessage("Error, provijeri svoju internetsku vezu, pa pokusaj ponovo!");
+            });
+    }
+
+    const dispenserFromServicerToExpense = (credentials, setSubmitting) => {
+        const url = "https://salty-river-31434.herokuapp.com/dispenser/dispenserFromServicerToExpense"
+
+        axios
+            .post(url, credentials)
+            .then((response) => {
+                const result = response.data;
+                const { message, status } = result;
+
+                if (status !== "SUCCESS") {
+                    handleMessage(message);
+                }
+                else {
+                    handleSuccessMessage(message);
+                }
+
+                setSubmitting(false);
+            })
+            .catch(err => {
+                setSubmitting(false);
+                handleMessage("Error, provijeri svoju internetsku vezu, pa pokusaj ponovo!");
+            });
+    }
+
+    const dispenserFromServicerToCentral = (credentials, setSubmitting) => {
+        const url = "https://salty-river-31434.herokuapp.com/dispenser/dispenserFromServicerToCentral"
 
         axios
             .post(url, credentials)
@@ -1096,6 +1144,176 @@ export default function Transfers({ navigation }) {
                                                         keyboardType="numeric"
                                                     />
 
+                                                    <Input
+                                                        icon="user"
+                                                        placeholder="Ime servisera"
+                                                        placeholderTextColor="#888"
+                                                        onChangeText={handleChange("name")}
+                                                        onBlur={handleBlur("name")}
+                                                        value={values.name}
+                                                        returnKeyType="next"
+                                                    />
+
+                                                    <Input
+                                                        icon="clipboard"
+                                                        placeholder="Inventurni broj"
+                                                        placeholderTextColor="#888"
+                                                        onChangeText={handleChange("invNumber")}
+                                                        onBlur={handleBlur("invNumber")}
+                                                        value={values.invNumber}
+                                                        returnKeyType="next"
+                                                    />
+                                                </View>
+
+                                                <MsgBox style={{ marginTop: hp(0.5) }}>{message}</MsgBox>
+                                                <SuccessMsgBox>{successMessage}</SuccessMsgBox>
+
+                                                {!isSubmitting ? (
+                                                    <SubmitButton style={{ marginTop: hp(1) }} onPress={handleSubmit}>
+                                                        <SubmitButtonText>submit</SubmitButtonText>
+                                                    </SubmitButton>
+                                                ) : (
+                                                    <SubmitButton disabled={true}>
+                                                        <ActivityIndicator size={hp(2.5)} color="#fff" />
+                                                    </SubmitButton>
+                                                )}
+
+                                            </View>
+                                        )
+                                    }
+                                </Formik>
+
+                                <TouchableOpacity
+                                    onPress={() => {
+                                        setSelected(null);
+                                        setSuccessMessage(null);
+                                        setMessage(null);
+                                    }}
+                                    style={{ marginVertical: hp(2) }}>
+                                    <Text style={{ color: "#fff" }}>Zatvori</Text>
+                                </TouchableOpacity>
+                            </View>
+                        </View>
+                    </KeyboardAvoidingWrapper>
+                </Modal>
+
+                {/* Modal dispenser - from servicer to expense*/}
+                <Modal
+                    animationType="slide"
+                    transparent={true}
+                    visible={selected === 6}
+                    onRequestClose={() => {
+                        setSelected(null);
+                        setMessage(null);
+                        setSuccessMessage(null);
+                    }}
+                >
+                    <KeyboardAvoidingWrapper>
+                        <View style={styles.centeredView4}>
+                            <View style={styles.modalView4}>
+
+                                <Formik
+                                    initialValues={{
+                                        name: "",
+                                        invNumber: ""
+                                    }}
+                                    onSubmit={(values, { setSubmitting }) => {
+                                        values = { ...values };
+                                        dispenserFromServicerToExpense(values, setSubmitting);
+                                        setMessage(null);
+                                        setSuccessMessage(null);
+                                    }}
+                                >
+                                    {
+                                        ({ handleChange, handleBlur, handleSubmit, setFieldValue, values, isSubmitting, handleReset }) => (
+                                            <View style={{ alignItems: "center" }}>
+
+                                                <View style={styles.dispenserContainer}>
+                                                    <Input
+                                                        icon="user"
+                                                        placeholder="Ime servisera"
+                                                        placeholderTextColor="#888"
+                                                        onChangeText={handleChange("name")}
+                                                        onBlur={handleBlur("name")}
+                                                        value={values.name}
+                                                        returnKeyType="next"
+                                                    />
+
+                                                    <Input
+                                                        icon="clipboard"
+                                                        placeholder="Inventurni broj"
+                                                        placeholderTextColor="#888"
+                                                        onChangeText={handleChange("invNumber")}
+                                                        onBlur={handleBlur("invNumber")}
+                                                        value={values.invNumber}
+                                                        returnKeyType="next"
+                                                    />
+                                                </View>
+
+                                                <MsgBox style={{ marginTop: hp(0.5) }}>{message}</MsgBox>
+                                                <SuccessMsgBox>{successMessage}</SuccessMsgBox>
+
+                                                {!isSubmitting ? (
+                                                    <SubmitButton style={{ marginTop: hp(1) }} onPress={handleSubmit}>
+                                                        <SubmitButtonText>submit</SubmitButtonText>
+                                                    </SubmitButton>
+                                                ) : (
+                                                    <SubmitButton disabled={true}>
+                                                        <ActivityIndicator size={hp(2.5)} color="#fff" />
+                                                    </SubmitButton>
+                                                )}
+
+                                            </View>
+                                        )
+                                    }
+                                </Formik>
+
+                                <TouchableOpacity
+                                    onPress={() => {
+                                        setSelected(null);
+                                        setSuccessMessage(null);
+                                        setMessage(null);
+                                    }}
+                                    style={{ marginVertical: hp(2) }}>
+                                    <Text style={{ color: "#fff" }}>Zatvori</Text>
+                                </TouchableOpacity>
+                            </View>
+                        </View>
+                    </KeyboardAvoidingWrapper>
+                </Modal>
+
+                {/* Modal dispenser - from servicer to expense*/}
+                <Modal
+                    animationType="slide"
+                    transparent={true}
+                    visible={selected === 7}
+                    onRequestClose={() => {
+                        setSelected(null);
+                        setMessage(null);
+                        setSuccessMessage(null);
+                    }}
+                >
+                    <KeyboardAvoidingWrapper>
+                        <View style={styles.centeredView4}>
+                            <View style={styles.modalView4}>
+
+                                <Formik
+                                    initialValues={{
+                                        name: "",
+                                        invNumber: ""
+                                    }}
+                                    onSubmit={(values, { setSubmitting }) => {
+                                        values = { ...values };
+                                        dispenserFromServicerToCentral(values, setSubmitting);
+                                        setMessage(null);
+                                        setSuccessMessage(null);
+                                    }}
+                                >
+                                    {
+                                        ({ handleChange, handleBlur, handleSubmit, setFieldValue, values, isSubmitting, handleReset }) => (
+                                            <View style={{ alignItems: "center" }}>
+
+                                                <View style={styles.dispenserContainer}>
                                                     <Input
                                                         icon="user"
                                                         placeholder="Ime servisera"

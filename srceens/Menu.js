@@ -559,7 +559,7 @@ const Menu = ({ navigation }) => {
 
                                                 <TouchableOpacity style={styles.invNumberTouch}>
                                                     <Text style={{ color: "#ff0" }}>Lokacija:  </Text>
-                                                    <Text style={{ color: "#fff" }}>{}</Text>
+                                                    <Text style={{ color: "#fff" }}>{selectedDispenser.location}</Text>
                                                 </TouchableOpacity>
                                             </View>
 
