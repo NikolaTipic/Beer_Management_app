@@ -36,8 +36,10 @@ const Menu = ({ navigation }) => {
     const [listMessage, setListMessage] = useState(null);
 
     const [selectedDispenser, setSelectedDispenser] = useState(null);
+    const [selectedFacility, setSelectedFacility] = useState(null);
 
     const [extend, setExtend] = useState(false);
+    const [facilityExtend, setFacilityExtend] = useState(null);
 
     const [expiredDispensersList, setExpiredDispenserList] = useState([]);
 
@@ -91,15 +93,48 @@ const Menu = ({ navigation }) => {
             .catch(err => {
                 setSubmitting(false);
                 handleMessage("Error, provijeri svoju internetsku vezu, pa pokusaj ponovo!")
+            });
+
+    }
+
+    const handleFacilitySearch = (name, setSubmitting) => {
+        setMessage(message);
+
+        const url = "https://salty-river-31434.herokuapp.com/facility/getFacilities";
+
+        axios
+            .post(url, name)
+            .then((response) => {
+                const result = response.data;
+                const { status, message, data } = result;
+
+                if (status !== "SUCCESS") {
+                    setMessage(message);
+                    setSubmitting(false);
+
+                    return;
+                }
+
+                //why state cannot accept object from data? and why data has to be stored in variable to setState?
+                const facility = data;
+                setSelectedFacility(facility);
+
+                setSubmitting(false);
+            })
+            .catch(err => {
+                setSubmitting(false);
+                handleMessage("Error, provijeri svoju internetsku vezu, pa pokusaj ponovo!")
             })
 
     }
 
+
     const dateToString = (date) => {
         const typeDate = new Date(date);
-        
+
         return typeDate.toDateString();
     }
+
 
     const handleExpiredDispensers = () => {
         const url = "https://salty-river-31434.herokuapp.com/dispenser/checkForExpiredSanitation"
@@ -128,6 +163,7 @@ const Menu = ({ navigation }) => {
             })
     }
 
+
     const renderfExpiredDispenser = (index) => {
         if (index % 2 == 0)
             return (
@@ -141,36 +177,6 @@ const Menu = ({ navigation }) => {
             );
     }
 
-    // const listOfExpiredDispensers = expiredDispensersList.map((dispenser, index) =>
-    // <View key={index}>
-    //     <Text key={index}>{dispenser}</Text>
-    // </View>
-    // );
-
-
-    const removeItem = (credentials, setSubmitting) => {
-        const url = "https://salty-river-31434.herokuapp.com/part/removePart";
-
-        axios
-            .post(url, credentials)
-            .then((response) => {
-                const result = response.data;
-                const { message, status } = result;
-
-                if (status !== "SUCCESS") {
-                    handleMessage(message);
-                }
-                else {
-                    handleSuccessMessage(message);
-                }
-
-                setSubmitting(false);
-            })
-            .catch(err => {
-                setSubmitting(false);
-                handleMessage("Error, provijeri svoju internetsku vezu, pa pokusaj ponovo!");
-            })
-    }
 
     return (
         <>
@@ -209,395 +215,541 @@ const Menu = ({ navigation }) => {
                         <TouchableOpacity onPress={() => navigation.navigate("AddMenu")} style={styles.iconBox}>
                             <MaterialCommunityIcons name="database" size={wp(5)} color={"#fff"} />
                         </TouchableOpacity>
-                        <TouchableOpacity onPress={() => setModalPartsVisible(true)} style={styles.iconBox}>
-                            <Feather name="trash" size={wp(5)} color={"#fff"} />
+                        <TouchableOpacity onPress={() => navigation.navigate("Transfers")} style={styles.iconBox}>
+                            <Feather name="repeat" size={wp(5)} color={"#fff"} />
                         </TouchableOpacity>
 
                     </View>
+                    <View style={{ height: hp(61), overflow: "scroll" }}>
+                        <ScrollView>
+                            {/*Search dispensers*/}
+                            <View style={styles.formikContainer}>
+                                <Formik
+                                    initialValues={{ invNumber: "" }}
+                                    onSubmit={(values, { setSubmitting }) => {
+                                        if (values.invNumber == "") {
+                                            handleMessage("Unos inventurnog broja je obavezan!");
+                                            setSubmitting(false);
+                                        }
+                                        else {
+                                            handleSearch(values, setSubmitting);
+                                            values.invNumber = "";
+                                        }
+                                    }}
+                                >
+                                    {({ handleChange, handleBlur, handleSubmit, values, isSubmitting }) => (
+                                        <View style={styles.searchContainer}>
+                                            <View style={styles.searchView}>
+                                                <StylesTextInputSearchBar
+                                                    placeholder="Unesite inventurni broj..."
+                                                    placeholderTextColor={"#888"}
+                                                    onChangeText={handleChange("invNumber")}
+                                                    onBlur={handleBlur("invNumber")}
+                                                    value={values.invNumber}
+                                                />
+                                                {!isSubmitting ? (
+                                                    <RightIcon onPress={() => {
+                                                        handleSubmit();
+                                                        setMessage(null);
+                                                        setSuccessMessage(null);
+                                                    }}>
+                                                        <Feather name="search" size={wp(5.5)} color={"#ff0"} />
+                                                    </RightIcon>
+                                                ) : (
+                                                    <RightIcon disabled={true}>
+                                                        <ActivityIndicator size={hp(2.5)} color="#ff0" />
+                                                    </RightIcon>
+                                                )}
+                                            </View>
+                                            {message && (
+                                                <View style={styles.msgContainer}>
+                                                    <MsgBox>{message}</MsgBox>
+                                                </View>
+                                            )}
 
-                    {/* modal for deleting parts from inventory */}
-                    <Modal
-                        animationType="slide"
-                        transparent={true}
-                        visible={modalPartsVisible}
-                        onRequestClose={() => {
-                            setModalVisible(!modalPartsVisible);
-                            setMessage(null);
-                            setSuccessMessage(null);
-                        }}
-                    >
-                        <KeyboardAvoidingWrapper>
-                            <View style={styles.centeredView2}>
-                                <View style={styles.modalView2}>
-
-                                    <Formik
-                                        initialValues={{
-                                            quantityUnit: "",
-                                            productName: "",
-                                            productCode: "",
-                                            quantity: ""
-                                        }}
-                                        onSubmit={(values, { setSubmitting }) => {
-                                            setMessage(null);
-                                            setSuccessMessage(null);
-                                            values = { ...values };
-                                            removeItem(values, setSubmitting);
-                                        }}
-                                    >
-                                        {
-                                            ({ handleChange, handleBlur, handleSubmit, setFieldValue, values, isSubmitting, handleReset }) => (
-                                                <View style={{ alignItems: "center" }}>
-
-                                                    <View style={styles.dispenserContainer}>
-                                                        <Input
-                                                            icon="tool"
-                                                            placeholder="Naziv proizvoda"
-                                                            placeholderTextColor="#888"
-                                                            onChangeText={handleChange("productName")}
-                                                            onBlur={handleBlur("productName")}
-                                                            value={values.productName}
-                                                            returnKeyType="next"
+                                            {selectedDispenser && (
+                                                <View style={{ flexDirection: "row", marginTop: hp(1) }}>
+                                                    <View style={{
+                                                        borderRadius: wp(50),
+                                                        height: hp(3.5),
+                                                        width: hp(3.5),
+                                                        justifyContent: "center",
+                                                        alignItems: "center",
+                                                        marginRight: wp(2),
+                                                        backgroundColor: "rgba(255,255,0,0.5)",
+                                                        marginTop: hp(1)
+                                                    }}>
+                                                        <MaterialCommunityIcons
+                                                            name="beer-outline"
+                                                            size={wp(3.5)}
+                                                            color={"#000"}
                                                         />
-
-                                                        <Input
-                                                            icon="hash"
-                                                            placeholder="Šifra proizvoda"
-                                                            placeholderTextColor="#888"
-                                                            onChangeText={handleChange("productCode")}
-                                                            onBlur={handleBlur("productCode")}
-                                                            value={values.productCode}
-                                                            returnKeyType="next"
-                                                            keyboardType="numeric"
-                                                        />
-
-                                                        <Input
-                                                            icon="minus"
-                                                            placeholder="Količina"
-                                                            placeholderTextColor="#888"
-                                                            onChangeText={handleChange("quantity")}
-                                                            onBlur={handleBlur("quantity")}
-                                                            value={values.quantity}
-                                                            returnKeyType="next"
-                                                            keyboardType="numeric"
-                                                        />
-
-
                                                     </View>
 
-                                                    <MsgBox style={{ marginTop: hp(0.5) }}>{message}</MsgBox>
-                                                    <SuccessMsgBox>{successMessage}</SuccessMsgBox>
+                                                    <TouchableOpacity
+                                                        style={styles.invNumberTouch}
+                                                        onPress={() => setExtend(true)}
+                                                    >
+                                                        <Text style={{ color: "#ff0" }}>Inventurni broj:  </Text>
+                                                        <Text style={{ color: "#fff" }}>{selectedDispenser.invNumber}</Text>
+                                                    </TouchableOpacity>
 
-                                                    {!isSubmitting ? (
-                                                        <SubmitButton style={{ marginTop: hp(1) }} onPress={handleSubmit}>
-                                                            <SubmitButtonText>submit</SubmitButtonText>
-                                                        </SubmitButton>
-                                                    ) : (
-                                                        <SubmitButton disabled={true}>
-                                                            <ActivityIndicator size={hp(2.5)} color="#fff" />
-                                                        </SubmitButton>
-                                                    )}
-
+                                                    <TouchableOpacity onPress={() => {
+                                                        setSelectedDispenser(null);
+                                                        setExtend(false)
+                                                    }
+                                                    }>
+                                                        <View style={{
+                                                            borderRadius: wp(50),
+                                                            height: hp(3.5),
+                                                            width: hp(3.5),
+                                                            justifyContent: "center",
+                                                            alignItems: "center",
+                                                            marginLeft: wp(2),
+                                                            backgroundColor: "rgba(255,255,0,0.5)",
+                                                            marginTop: hp(1)
+                                                        }}>
+                                                            <Feather
+                                                                name="x-circle"
+                                                                size={wp(3.5)}
+                                                                color={"#000"}
+                                                            />
+                                                        </View>
+                                                    </TouchableOpacity>
                                                 </View>
-                                            )
-                                        }
-                                    </Formik>
+                                            )}
+
+                                            {extend && (
+                                                <>
+                                                    <View style={{ flexDirection: "row" }}>
+                                                        <View style={{
+                                                            borderRadius: wp(50),
+                                                            height: hp(3.5),
+                                                            width: hp(3.5),
+                                                            justifyContent: "center",
+                                                            alignItems: "center",
+                                                            marginRight: wp(2),
+                                                            backgroundColor: "rgba(255,255,0,0.5)",
+                                                            marginTop: hp(1)
+                                                        }}>
+                                                            <Feather
+                                                                name="edit-3"
+                                                                size={wp(3.5)}
+                                                                color={"#000"}
+                                                            />
+                                                        </View>
+
+                                                        <TouchableOpacity style={styles.invNumberTouch}>
+                                                            <Text style={{ color: "#ff0" }}>Serijski broj:  </Text>
+                                                            <Text style={{ color: "#fff" }}>{selectedDispenser.serialNum}</Text>
+                                                        </TouchableOpacity>
+                                                    </View>
+
+                                                    <View style={{ flexDirection: "row" }}>
+                                                        <View style={{
+                                                            borderRadius: wp(50),
+                                                            height: hp(3.5),
+                                                            width: hp(3.5),
+                                                            justifyContent: "center",
+                                                            alignItems: "center",
+                                                            marginRight: wp(2),
+                                                            backgroundColor: "rgba(255,255,0,0.5)",
+                                                            marginTop: hp(1)
+                                                        }}>
+                                                            <Feather
+                                                                name="edit-3"
+                                                                size={wp(3.5)}
+                                                                color={"#000"}
+                                                            />
+                                                        </View>
+
+                                                        <TouchableOpacity style={styles.invNumberTouch}>
+                                                            <Text style={{ color: "#ff0" }}>status:  </Text>
+                                                            <Text style={{ color: "#fff" }}>{selectedDispenser.status}</Text>
+                                                        </TouchableOpacity>
+                                                    </View>
+
+                                                    <View style={{ flexDirection: "row" }}>
+                                                        <View style={{
+                                                            borderRadius: wp(50),
+                                                            height: hp(3.5),
+                                                            width: hp(3.5),
+                                                            justifyContent: "center",
+                                                            alignItems: "center",
+                                                            marginRight: wp(2),
+                                                            backgroundColor: "rgba(255,255,0,0.5)",
+                                                            marginTop: hp(1)
+                                                        }}>
+                                                            <Feather
+                                                                name="edit-3"
+                                                                size={wp(3.5)}
+                                                                color={"#000"}
+                                                            />
+                                                        </View>
+
+                                                        <TouchableOpacity style={styles.invNumberTouch}>
+                                                            <Text style={{ color: "#ff0" }}>Model:  </Text>
+                                                            <Text style={{ color: "#fff" }}>{selectedDispenser.model}</Text>
+                                                        </TouchableOpacity>
+                                                    </View>
+
+                                                    <View style={{ flexDirection: "row" }}>
+                                                        <View style={{
+                                                            borderRadius: wp(50),
+                                                            height: hp(3.5),
+                                                            width: hp(3.5),
+                                                            justifyContent: "center",
+                                                            alignItems: "center",
+                                                            marginRight: wp(2),
+                                                            backgroundColor: "rgba(255,255,0,0.5)",
+                                                            marginTop: hp(1)
+                                                        }}>
+                                                            <Feather
+                                                                name="calendar"
+                                                                size={wp(3.5)}
+                                                                color={"#000"}
+                                                            />
+                                                        </View>
+
+                                                        <TouchableOpacity style={styles.invNumberTouch}>
+                                                            <Text style={{ color: "#ff0" }}>Datum Z S:  </Text>
+                                                            <Text style={{ color: "#fff" }}>{dateToString(selectedDispenser.dateOfLastSanitation)}</Text>
+                                                        </TouchableOpacity>
+                                                    </View>
+
+                                                    <View style={{ flexDirection: "row" }}>
+                                                        <View style={{
+                                                            borderRadius: wp(50),
+                                                            height: hp(3.5),
+                                                            width: hp(3.5),
+                                                            justifyContent: "center",
+                                                            alignItems: "center",
+                                                            marginRight: wp(2),
+                                                            backgroundColor: "rgba(255,255,0,0.5)",
+                                                            marginTop: hp(1)
+                                                        }}>
+                                                            <Feather
+                                                                name="clock"
+                                                                size={wp(3.5)}
+                                                                color={"#000"}
+                                                            />
+                                                        </View>
 
 
-                                    <TouchableOpacity
-                                        onPress={() => {
-                                            setModalPartsVisible(false);
-                                            setSuccessMessage(null);
-                                            setMessage(null);
-                                        }}
-                                        style={{ marginVertical: hp(2) }}>
-                                        <Text style={{ color: "#fff" }}>Zatvori</Text>
-                                    </TouchableOpacity>
-                                </View>
+
+                                                        <TouchableOpacity style={styles.invNumberTouch}>
+                                                            <Text style={{ color: "#ff0" }}>Dana do Sanitacije:  </Text>
+                                                            <Text style={{ color: "#fff" }}>{selectedDispenser.dts}</Text>
+                                                        </TouchableOpacity>
+                                                    </View>
+
+                                                    <View style={{ flexDirection: "row" }}>
+                                                        <View style={{
+                                                            borderRadius: wp(50),
+                                                            height: hp(3.5),
+                                                            width: hp(3.5),
+                                                            justifyContent: "center",
+                                                            alignItems: "center",
+                                                            marginRight: wp(2),
+                                                            backgroundColor: "rgba(255,255,0,0.5)",
+                                                            marginTop: hp(1)
+                                                        }}>
+                                                            <Feather
+                                                                name="target"
+                                                                size={wp(3.5)}
+                                                                color={"#000"}
+                                                            />
+                                                        </View>
+
+
+
+                                                        <TouchableOpacity style={styles.invNumberTouch}>
+                                                            <Text style={{ color: "#ff0" }}>Lokacija:  </Text>
+                                                            <Text style={{ color: "#fff" }}>{selectedDispenser.location}</Text>
+                                                        </TouchableOpacity>
+                                                    </View>
+
+                                                    <View style={{ flexDirection: "row" }}>
+                                                        <View style={{
+                                                            borderRadius: wp(50),
+                                                            height: hp(3.5),
+                                                            width: hp(3.5),
+                                                            justifyContent: "center",
+                                                            alignItems: "center",
+                                                            marginRight: wp(2),
+                                                            backgroundColor: "rgba(255,255,0,0.5)",
+                                                            marginTop: hp(1)
+                                                        }}>
+                                                            <Feather
+                                                                name="map-pin"
+                                                                size={wp(3.5)}
+                                                                color={"#000"}
+                                                            />
+                                                        </View>
+
+
+
+                                                        <TouchableOpacity style={styles.invNumberTouch}>
+                                                            <Text style={{ color: "#ff0" }}>Komentar:  </Text>
+                                                            <Text style={{ color: "#fff" }}>{selectedDispenser.comment}</Text>
+                                                        </TouchableOpacity>
+                                                    </View>
+                                                </>
+
+                                            )}
+
+                                        </View>
+                                    )}
+                                </Formik>
                             </View>
-                        </KeyboardAvoidingWrapper>
-                    </Modal>
 
-                    <View style={styles.formikContainer}>
-                        <Formik
-                            initialValues={{ invNumber: "" }}
-                            onSubmit={(values, { setSubmitting }) => {
-                                if (values.invNumber == "") {
-                                    handleMessage("Unos inventurnog broja je obavezan!");
-                                    setSubmitting(false);
-                                }
-                                else {
-                                    handleSearch(values, setSubmitting);
-                                    values.invNumber = "";
-                                }
-                            }}
-                        >
-                            {({ handleChange, handleBlur, handleSubmit, values, isSubmitting }) => (
-                                <View style={styles.searchContainer}>
-                                    <View style={styles.searchView}>
-                                        <StylesTextInputSearchBar
-                                            placeholder="Unesite inventurni broj..."
-                                            placeholderTextColor={"#888"}
-                                            onChangeText={handleChange("invNumber")}
-                                            onBlur={handleBlur("invNumber")}
-                                            value={values.invNumber}
-                                        />
-                                        {!isSubmitting ? (
-                                            <RightIcon onPress={() => {
-                                                handleSubmit();
-                                                setMessage(null);
-                                                setSuccessMessage(null);
-                                            }}>
-                                                <Feather name="search" size={wp(5.5)} color={"#ff0"} />
-                                            </RightIcon>
-                                        ) : (
-                                            <RightIcon disabled={true}>
-                                                <ActivityIndicator size={hp(2.5)} color="#ff0" />
-                                            </RightIcon>
-                                        )}
-                                    </View>
-                                    {message && (
-                                        <View style={styles.msgContainer}>
-                                            <MsgBox>{message}</MsgBox>
-                                        </View>
-                                    )}
-
-                                    {selectedDispenser && (
-                                        <View style={{ flexDirection: "row", marginTop: hp(1) }}>
-                                            <View style={{
-                                                borderRadius: wp(50),
-                                                height: hp(3.5),
-                                                width: hp(3.5),
-                                                justifyContent: "center",
-                                                alignItems: "center",
-                                                marginRight: wp(2),
-                                                backgroundColor: "rgba(255,255,0,0.5)",
-                                                marginTop: hp(1)
-                                            }}>
-                                                <MaterialCommunityIcons
-                                                    name="beer-outline"
-                                                    size={wp(3.5)}
-                                                    color={"#000"}
+                            {/*Search facilities */}
+                            <View style={styles.formikContainer}>
+                                <Formik
+                                    initialValues={{ name: "" }}
+                                    onSubmit={(values, { setSubmitting }) => {
+                                        if (values.name == "") {
+                                            handleMessage("Unos imena objekta je obavezan!");
+                                            setSubmitting(false);
+                                        }
+                                        else {
+                                            handleFacilitySearch(values, setSubmitting);
+                                            values.name = "";
+                                        }
+                                    }}
+                                >
+                                    {({ handleChange, handleBlur, handleSubmit, values, isSubmitting }) => (
+                                        <View style={styles.searchContainer}>
+                                            <View style={styles.searchView}>
+                                                <StylesTextInputSearchBar
+                                                    placeholder="Unesite ime objekta..."
+                                                    placeholderTextColor={"#888"}
+                                                    onChangeText={handleChange("name")}
+                                                    onBlur={handleBlur("name")}
+                                                    value={values.name}
                                                 />
+                                                {!isSubmitting ? (
+                                                    <RightIcon onPress={() => {
+                                                        handleSubmit();
+                                                        setMessage(null);
+                                                        setSuccessMessage(null);
+                                                    }}>
+                                                        <MaterialCommunityIcons name="home-search-outline" size={wp(6)} color={"#ff0"} />
+                                                    </RightIcon>
+                                                ) : (
+                                                    <RightIcon disabled={true}>
+                                                        <ActivityIndicator size={hp(2.5)} color="#ff0" />
+                                                    </RightIcon>
+                                                )}
                                             </View>
-
-                                            <TouchableOpacity
-                                                style={styles.invNumberTouch}
-                                                onPress={() => setExtend(true)}
-                                            >
-                                                <Text style={{ color: "#ff0" }}>Inventurni broj:  </Text>
-                                                <Text style={{ color: "#fff" }}>{selectedDispenser.invNumber}</Text>
-                                            </TouchableOpacity>
-
-                                            <TouchableOpacity onPress={() => {
-                                                setSelectedDispenser(null);
-                                                setExtend(false)
-                                            }
-                                            }>
-                                                <View style={{
-                                                    borderRadius: wp(50),
-                                                    height: hp(3.5),
-                                                    width: hp(3.5),
-                                                    justifyContent: "center",
-                                                    alignItems: "center",
-                                                    marginLeft: wp(2),
-                                                    backgroundColor: "rgba(255,255,0,0.5)",
-                                                    marginTop: hp(1)
-                                                }}>
-                                                    <Feather
-                                                        name="x-circle"
-                                                        size={wp(3.5)}
-                                                        color={"#000"}
-                                                    />
+                                            {message && (
+                                                <View style={styles.msgContainer}>
+                                                    <MsgBox>{message}</MsgBox>
                                                 </View>
-                                            </TouchableOpacity>
+                                            )}
+
+                                            {selectedFacility && (
+                                                <View style={{ flexDirection: "column", marginTop: hp(1) }}>
+
+                                                    {selectedFacility.map((facility, index) => {
+                                                        return (
+                                                            <View>
+                                                                <View key={index} style={{ flexDirection: "row", marginTop: hp(1) }}>
+                                                                    <View style={{
+                                                                        borderRadius: wp(50),
+                                                                        height: hp(3.5),
+                                                                        width: hp(3.5),
+                                                                        justifyContent: "center",
+                                                                        alignItems: "center",
+                                                                        marginRight: wp(2),
+                                                                        backgroundColor: "rgba(255,255,0,0.5)",
+                                                                        marginTop: hp(1)
+                                                                    }}>
+                                                                        <MaterialCommunityIcons
+                                                                            name="beer-outline"
+                                                                            size={wp(3.5)}
+                                                                            color={"#000"}
+                                                                        />
+                                                                    </View>
+
+                                                                    <TouchableOpacity
+                                                                        style={styles.invNumberTouch}
+                                                                        onPress={() => setFacilityExtend(index)}
+                                                                    >
+                                                                        <Text style={{ color: "#ff0" }}> Ime Objekta:  </Text>
+                                                                        <Text key={index} style={{ color: "#fff" }}>{facility.name}</Text>
+                                                                    </TouchableOpacity>
+
+                                                                    <TouchableOpacity onPress={() => {
+                                                                        setSelectedFacility(null);
+                                                                        setFacilityExtend(null)
+                                                                    }
+                                                                    }>
+                                                                        <View style={{
+                                                                            borderRadius: wp(50),
+                                                                            height: hp(3.5),
+                                                                            width: hp(3.5),
+                                                                            justifyContent: "center",
+                                                                            alignItems: "center",
+                                                                            marginLeft: wp(2),
+                                                                            backgroundColor: "rgba(255,255,0,0.5)",
+                                                                            marginTop: hp(1)
+                                                                        }}>
+                                                                            <Feather
+                                                                                name="x-circle"
+                                                                                size={wp(3.5)}
+                                                                                color={"#000"}
+                                                                            />
+                                                                        </View>
+                                                                    </TouchableOpacity>
+                                                                </View>
+
+                                                                {facilityExtend === index && (
+                                                                    <>
+                                                                        <View style={{ flexDirection: "row" }}>
+                                                                            <View style={{
+                                                                                borderRadius: wp(50),
+                                                                                height: hp(3.5),
+                                                                                width: hp(3.5),
+                                                                                justifyContent: "center",
+                                                                                alignItems: "center",
+                                                                                marginRight: wp(2),
+                                                                                backgroundColor: "rgba(255,255,0,0.5)",
+                                                                                marginTop: hp(1)
+                                                                            }}>
+                                                                                <Feather
+                                                                                    name="edit-3"
+                                                                                    size={wp(3.5)}
+                                                                                    color={"#000"}
+                                                                                />
+                                                                            </View>
+
+                                                                            <TouchableOpacity style={styles.invNumberTouch}>
+                                                                                <Text style={{ color: "#ff0" }}>ID objekta:  </Text>
+                                                                                <Text style={{ color: "#fff" }}>{facility.id}</Text>
+                                                                            </TouchableOpacity>
+                                                                        </View>
+
+                                                                        <View style={{ flexDirection: "row" }}>
+                                                                            <View style={{
+                                                                                borderRadius: wp(50),
+                                                                                height: hp(3.5),
+                                                                                width: hp(3.5),
+                                                                                justifyContent: "center",
+                                                                                alignItems: "center",
+                                                                                marginRight: wp(2),
+                                                                                backgroundColor: "rgba(255,255,0,0.5)",
+                                                                                marginTop: hp(1)
+                                                                            }}>
+                                                                                <Feather
+                                                                                    name="edit-3"
+                                                                                    size={wp(3.5)}
+                                                                                    color={"#000"}
+                                                                                />
+                                                                            </View>
+
+                                                                            <TouchableOpacity style={styles.invNumberTouch}>
+                                                                                <Text style={{ color: "#ff0" }}>Grad:  </Text>
+                                                                                <Text style={{ color: "#fff" }}>{facility.location.city}</Text>
+                                                                            </TouchableOpacity>
+                                                                        </View>
+
+                                                                        <View style={{ flexDirection: "row" }}>
+                                                                            <View style={{
+                                                                                borderRadius: wp(50),
+                                                                                height: hp(3.5),
+                                                                                width: hp(3.5),
+                                                                                justifyContent: "center",
+                                                                                alignItems: "center",
+                                                                                marginRight: wp(2),
+                                                                                backgroundColor: "rgba(255,255,0,0.5)",
+                                                                                marginTop: hp(1)
+                                                                            }}>
+                                                                                <Feather
+                                                                                    name="edit-3"
+                                                                                    size={wp(3.5)}
+                                                                                    color={"#000"}
+                                                                                />
+                                                                            </View>
+
+                                                                            <TouchableOpacity style={styles.invNumberTouch}>
+                                                                                <Text style={{ color: "#ff0" }}>Adresa:  </Text>
+                                                                                <Text style={{ color: "#fff" }}>{facility.location.address}</Text>
+                                                                            </TouchableOpacity>
+                                                                        </View>
+
+                                                                        <View style={{ flexDirection: "row" }}>
+                                                                            <View style={{
+                                                                                borderRadius: wp(50),
+                                                                                height: hp(3.5),
+                                                                                width: hp(3.5),
+                                                                                justifyContent: "center",
+                                                                                alignItems: "center",
+                                                                                marginRight: wp(2),
+                                                                                backgroundColor: "rgba(255,255,0,0.5)",
+                                                                                marginTop: hp(1)
+                                                                            }}>
+                                                                                <Feather
+                                                                                    name="calendar"
+                                                                                    size={wp(3.5)}
+                                                                                    color={"#000"}
+                                                                                />
+                                                                            </View>
+
+                                                                            <TouchableOpacity style={styles.invNumberTouch}>
+                                                                                <Text style={{ color: "#ff0" }}>Komentar:  </Text>
+                                                                                <Text style={{ color: "#fff" }}>{facility.comment}</Text>
+                                                                            </TouchableOpacity>
+                                                                        </View>
+
+                                                                        <View style={{ flexDirection: "row" }}>
+                                                                            <View style={{
+                                                                                borderRadius: wp(50),
+                                                                                height: hp(3.5),
+                                                                                width: hp(3.5),
+                                                                                justifyContent: "center",
+                                                                                alignItems: "center",
+                                                                                marginRight: wp(2),
+                                                                                backgroundColor: "rgba(255,255,0,0.5)",
+                                                                                marginTop: hp(1)
+                                                                            }}>
+                                                                                <Feather
+                                                                                    name="calendar"
+                                                                                    size={wp(3.5)}
+                                                                                    color={"#000"}
+                                                                                />
+                                                                            </View>
+
+                                                                            <TouchableOpacity style={styles.invNumberTouch}>
+                                                                                <View>
+                                                                                    <Text style={{ color: "#ff0", alignSelf: "center" }}>Točionici:  </Text>
+                                                                                    <View>
+                                                                                        {facility.dispensers.map((dispenser, index) => {
+                                                                                            return (
+                                                                                                <Text key={index} style={{ color: "#fff" }}>- {dispenser.invNumber} - {dispenser.status}</Text>
+                                                                                            );
+                                                                                        })}
+                                                                                    </View>
+                                                                                </View>
+                                                                            </TouchableOpacity>
+                                                                        </View>
+                                                                    </>
+
+                                                                )}
+                                                            </View>
+                                                        );
+                                                    })}
+                                                </View>
+                                            )}
+
                                         </View>
                                     )}
-
-                                    {extend && (
-                                        <>
-                                            <View style={{ flexDirection: "row" }}>
-                                                <View style={{
-                                                    borderRadius: wp(50),
-                                                    height: hp(3.5),
-                                                    width: hp(3.5),
-                                                    justifyContent: "center",
-                                                    alignItems: "center",
-                                                    marginRight: wp(2),
-                                                    backgroundColor: "rgba(255,255,0,0.5)",
-                                                    marginTop: hp(1)
-                                                }}>
-                                                    <Feather
-                                                        name="edit-3"
-                                                        size={wp(3.5)}
-                                                        color={"#000"}
-                                                    />
-                                                </View>
-
-                                                <TouchableOpacity style={styles.invNumberTouch}>
-                                                    <Text style={{ color: "#ff0" }}>Serijski broj:  </Text>
-                                                    <Text style={{ color: "#fff" }}>{selectedDispenser.serialNum}</Text>
-                                                </TouchableOpacity>
-                                            </View>
-
-                                            <View style={{ flexDirection: "row" }}>
-                                                <View style={{
-                                                    borderRadius: wp(50),
-                                                    height: hp(3.5),
-                                                    width: hp(3.5),
-                                                    justifyContent: "center",
-                                                    alignItems: "center",
-                                                    marginRight: wp(2),
-                                                    backgroundColor: "rgba(255,255,0,0.5)",
-                                                    marginTop: hp(1)
-                                                }}>
-                                                    <Feather
-                                                        name="edit-3"
-                                                        size={wp(3.5)}
-                                                        color={"#000"}
-                                                    />
-                                                </View>
-
-                                                <TouchableOpacity style={styles.invNumberTouch}>
-                                                    <Text style={{ color: "#ff0" }}>status:  </Text>
-                                                    <Text style={{ color: "#fff" }}>{selectedDispenser.status}</Text>
-                                                </TouchableOpacity>
-                                            </View>
-
-                                            <View style={{ flexDirection: "row" }}>
-                                                <View style={{
-                                                    borderRadius: wp(50),
-                                                    height: hp(3.5),
-                                                    width: hp(3.5),
-                                                    justifyContent: "center",
-                                                    alignItems: "center",
-                                                    marginRight: wp(2),
-                                                    backgroundColor: "rgba(255,255,0,0.5)",
-                                                    marginTop: hp(1)
-                                                }}>
-                                                    <Feather
-                                                        name="edit-3"
-                                                        size={wp(3.5)}
-                                                        color={"#000"}
-                                                    />
-                                                </View>
-
-                                                <TouchableOpacity style={styles.invNumberTouch}>
-                                                    <Text style={{ color: "#ff0" }}>Model:  </Text>
-                                                    <Text style={{ color: "#fff" }}>{selectedDispenser.model}</Text>
-                                                </TouchableOpacity>
-                                            </View>
-
-                                            <View style={{ flexDirection: "row" }}>
-                                                <View style={{
-                                                    borderRadius: wp(50),
-                                                    height: hp(3.5),
-                                                    width: hp(3.5),
-                                                    justifyContent: "center",
-                                                    alignItems: "center",
-                                                    marginRight: wp(2),
-                                                    backgroundColor: "rgba(255,255,0,0.5)",
-                                                    marginTop: hp(1)
-                                                }}>
-                                                    <Feather
-                                                        name="calendar"
-                                                        size={wp(3.5)}
-                                                        color={"#000"}
-                                                    />
-                                                </View>
-
-                                                <TouchableOpacity style={styles.invNumberTouch}>
-                                                    <Text style={{ color: "#ff0" }}>Datum Z S:  </Text>
-                                                    <Text style={{ color: "#fff" }}>{dateToString(selectedDispenser.dateOfLastSanitation)}</Text>
-                                                </TouchableOpacity>
-                                            </View>
-
-                                            <View style={{ flexDirection: "row" }}>
-                                                <View style={{
-                                                    borderRadius: wp(50),
-                                                    height: hp(3.5),
-                                                    width: hp(3.5),
-                                                    justifyContent: "center",
-                                                    alignItems: "center",
-                                                    marginRight: wp(2),
-                                                    backgroundColor: "rgba(255,255,0,0.5)",
-                                                    marginTop: hp(1)
-                                                }}>
-                                                    <Feather
-                                                        name="clock"
-                                                        size={wp(3.5)}
-                                                        color={"#000"}
-                                                    />
-                                                </View>
-
-
-
-                                                <TouchableOpacity style={styles.invNumberTouch}>
-                                                    <Text style={{ color: "#ff0" }}>Dana do Sanitacije:  </Text>
-                                                    <Text style={{ color: "#fff" }}>{selectedDispenser.dts}</Text>
-                                                </TouchableOpacity>
-                                            </View>
-
-                                            <View style={{ flexDirection: "row" }}>
-                                                <View style={{
-                                                    borderRadius: wp(50),
-                                                    height: hp(3.5),
-                                                    width: hp(3.5),
-                                                    justifyContent: "center",
-                                                    alignItems: "center",
-                                                    marginRight: wp(2),
-                                                    backgroundColor: "rgba(255,255,0,0.5)",
-                                                    marginTop: hp(1)
-                                                }}>
-                                                    <Feather
-                                                        name="target"
-                                                        size={wp(3.5)}
-                                                        color={"#000"}
-                                                    />
-                                                </View>
-
-
-
-                                                <TouchableOpacity style={styles.invNumberTouch}>
-                                                    <Text style={{ color: "#ff0" }}>Lokacija:  </Text>
-                                                    <Text style={{ color: "#fff" }}>{selectedDispenser.location}</Text>
-                                                </TouchableOpacity>
-                                            </View>
-
-                                            <View style={{ flexDirection: "row" }}>
-                                                <View style={{
-                                                    borderRadius: wp(50),
-                                                    height: hp(3.5),
-                                                    width: hp(3.5),
-                                                    justifyContent: "center",
-                                                    alignItems: "center",
-                                                    marginRight: wp(2),
-                                                    backgroundColor: "rgba(255,255,0,0.5)",
-                                                    marginTop: hp(1)
-                                                }}>
-                                                    <Feather
-                                                        name="map-pin"
-                                                        size={wp(3.5)}
-                                                        color={"#000"}
-                                                    />
-                                                </View>
-
-
-
-                                                <TouchableOpacity style={styles.invNumberTouch}>
-                                                    <Text style={{ color: "#ff0" }}>Komentar:  </Text>
-                                                    <Text style={{ color: "#fff" }}>{selectedDispenser.comment}</Text>
-                                                </TouchableOpacity>
-                                            </View>
-                                        </>
-
-                                    )}
-
-                                </View>
-                            )}
-                        </Formik>
+                                </Formik>
+                            </View>
+                        </ScrollView>
                     </View>
 
-                    <View style={styles.scrollContainer}>
+                    {/* <View style={styles.scrollContainer}>
                         <TouchableOpacity onPress={handleExpiredDispensers}>
                             <Text>Prikazi istekle točionike</Text>
                         </TouchableOpacity>
@@ -607,7 +759,7 @@ const Menu = ({ navigation }) => {
                                 expiredDispensersList.map((dispenser, index) => renderfExpiredDispenser(index))
                             }
                         </ScrollView>
-                    </View>
+                    </View> */}
 
                 </LinearGradient>
             </ImageBackground>
@@ -737,7 +889,8 @@ const styles = StyleSheet.create({
         width: wp(60),
         maxWidth: wp(60),
         alignSelf: "center",
-        paddingVertical: wp(1)
+        paddingVertical: wp(1),
+        flexWrap: "wrap"
     },
     scrollContainer: {
         backgroundColor: "rgba(255,255,255, 0.5)",
