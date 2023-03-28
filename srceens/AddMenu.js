@@ -786,7 +786,7 @@ export default function AddMenu({ navigation }) {
                 <View style={styles.menuContainer}>
                     <View style={styles.iconView}>
                         <TouchableOpacity onPress={() => setModalVisible(true)} style={styles.iconBox}>
-                            <MaterialCommunityIcons name="beer-outline" size={wp(6)} color={"#ff0"} />
+                            <MaterialCommunityIcons name="water-pump" size={wp(6)} color={"#ff0"} />
                         </TouchableOpacity>
                         <Text style={{ fontFamily: "Montserrat" }}>Dodaj točionik</Text>
                     </View>

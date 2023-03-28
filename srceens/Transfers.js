@@ -1377,12 +1377,12 @@ export default function Transfers({ navigation }) {
                     <View style={styles.iconContainer}>
                         <View style={styles.menuBottomContainerLeft}>
                             <TouchableOpacity onPress={() => setSelected(0)} style={styles.iconBox}>
-                                <MaterialCommunityIcons name="domain-plus" size={wp(5)} color={"#ff0"} />
+                                <MaterialCommunityIcons name="home-plus" size={wp(5)} color={"#ff0"} />
                             </TouchableOpacity>
                         </View>
                         <View style={styles.menuBottomContainerRight}>
                             <TouchableOpacity onPress={() => setSelected(1)} style={styles.iconBox}>
-                                <MaterialCommunityIcons name="domain-remove" size={wp(5)} color={"#ff0"} />
+                                <MaterialCommunityIcons name="home-remove" size={wp(5)} color={"#ff0"} />
                             </TouchableOpacity>
                         </View>
                     </View>
@@ -1448,7 +1448,7 @@ export default function Transfers({ navigation }) {
 
                     <View style={styles.menuBottomContainerRight}>
                         <TouchableOpacity onPress={() => setSelected(9)} style={styles.iconBox}>
-                            <MaterialCommunityIcons name="beer-outline" size={wp(5)} color={"#ff0"} />
+                            <MaterialCommunityIcons name="water-pump" size={wp(5)} color={"#ff0"} />
                         </TouchableOpacity>
                     </View>
                 </View>

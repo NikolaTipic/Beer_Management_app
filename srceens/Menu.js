@@ -26,6 +26,7 @@ import axios from 'axios';
 //Keyboard avoiding view
 import KeyboardAvoidingWrapper from '../components/KeyboardAvoidingWrapper';
 
+
 const Menu = ({ navigation }) => {
 
     //context
@@ -38,12 +39,17 @@ const Menu = ({ navigation }) => {
     const [selectedDispenser, setSelectedDispenser] = useState(null);
     const [selectedFacility, setSelectedFacility] = useState(null);
 
-    const [extend, setExtend] = useState(false);
+    const [extend, setExtend] = useState(null);
     const [facilityExtend, setFacilityExtend] = useState(null);
 
     const [expiredDispensersList, setExpiredDispenserList] = useState([]);
 
-    const [modalPartsVisible, setModalPartsVisible] = useState(false);
+    const [sending, setSending] = useState(null);
+    const [successMail, setSuccessMail] = useState(null);
+    const [current, setCurrent] = useState(0);
+
+    const [selected, setSelected] = useState(null);
+
     const [successMessage, setSuccessMessage] = useState(null);
 
     NavigationBar.setVisibilityAsync("hidden");
@@ -92,7 +98,7 @@ const Menu = ({ navigation }) => {
             })
             .catch(err => {
                 setSubmitting(false);
-                handleMessage("Error, provijeri svoju internetsku vezu, pa pokusaj ponovo!")
+                handleMessage("Error, provijeri svoju internetsku vezu, pa pokusaj ponovno!")
             });
 
     }
@@ -123,7 +129,7 @@ const Menu = ({ navigation }) => {
             })
             .catch(err => {
                 setSubmitting(false);
-                handleMessage("Error, provijeri svoju internetsku vezu, pa pokusaj ponovo!")
+                handleMessage("Error, provijeri svoju internetsku vezu, pa pokusaj ponovo!");
             })
 
     }
@@ -177,6 +183,205 @@ const Menu = ({ navigation }) => {
             );
     }
 
+    const exportFacilityReportXlsx = () => {
+        axios
+            .get("https://salty-river-31434.herokuapp.com/excel/exportFacilityReportXlsx")
+            .then((response) => {
+                const result = response.data;
+                const { status, message, data } = result;
+
+                if (status !== "SUCCESS") {
+                    setSuccessMail(0);
+                    setSending(null);
+
+                    return;
+                }
+
+                setSuccessMail(1);
+                setSending(null);
+            })
+            .catch(err => {
+                handleMessage("Error, provijeri svoju internetsku vezu, pa pokusaj ponovno!");
+                setSuccessMail(0);
+                setSending(null);
+            });
+    }
+
+    const exportFacilities = () => {
+        axios
+            .get("https://salty-river-31434.herokuapp.com/excel/exportFacilityXlsx")
+            .then((response) => {
+                const result = response.data;
+                const { status, message, data } = result;
+
+                if (status !== "SUCCESS") {
+                    setSuccessMail(0);
+                    setSending(null);
+
+                    return;
+                }
+
+                setSuccessMail(1);
+                setSending(null);
+            })
+            .catch(err => {
+                handleMessage("Error, provijeri svoju internetsku vezu, pa pokusaj ponovno!");
+                setSuccessMail(0);
+                setSending(null);
+            });
+    }
+
+    const exportDispensersCentralXlsx = () => {
+        axios
+            .get("https://salty-river-31434.herokuapp.com/excel/exportDispensersCentralXlsx")
+            .then((response) => {
+                const result = response.data;
+                const { status, message, data } = result;
+
+                if (status !== "SUCCESS") {
+                    setSuccessMail(0);
+                    setSending(null);
+
+                    return;
+                }
+
+                setSuccessMail(1);
+                setSending(null);
+            })
+            .catch(err => {
+                handleMessage("Error, provijeri svoju internetsku vezu, pa pokusaj ponovno!");
+                setSuccessMail(0);
+                setSending(null);
+            });
+    }
+
+    const exportDispensersExpenseXlsx = () => {
+        axios
+            .get("https://salty-river-31434.herokuapp.com/excel/exportDispensersExpenseXlsx")
+            .then((response) => {
+                const result = response.data;
+                const { status, message, data } = result;
+
+                if (status !== "SUCCESS") {
+                    setSuccessMail(0);
+                    setSending(null);
+
+                    return;
+                }
+
+                setSuccessMail(1);
+                setSending(null);
+            })
+            .catch(err => {
+                handleMessage("Error, provijeri svoju internetsku vezu, pa pokusaj ponovno!");
+                setSuccessMail(0);
+                setSending(null);
+            });
+    }
+
+    const exportPartsXlsx = () => {
+        axios
+            .get("https://salty-river-31434.herokuapp.com/excel/exportPartsXlsx")
+            .then((response) => {
+                const result = response.data;
+                const { status, message, data } = result;
+
+                if (status !== "SUCCESS") {
+                    setSuccessMail(0);
+                    setSending(null);
+
+                    return;
+                }
+
+                setSuccessMail(1);
+                setSending(null);
+            })
+            .catch(err => {
+                handleMessage("Error, provijeri svoju internetsku vezu, pa pokusaj ponovno!");
+                setSuccessMail(0);
+                setSending(null);
+            });
+    }
+
+    const exportPartsExpenseXlsx = () => {
+        axios
+            .get("https://salty-river-31434.herokuapp.com/excel/exportPartsExpenseXlsx")
+            .then((response) => {
+                const result = response.data;
+                const { status, message, data } = result;
+
+                if (status !== "SUCCESS") {
+                    setSuccessMail(0);
+                    setSending(null);
+
+                    return;
+                }
+
+                setSuccessMail(1);
+                setSending(null);
+            })
+            .catch(err => {
+                handleMessage("Error, provijeri svoju internetsku vezu, pa pokusaj ponovno!");
+                setSuccessMail(0);
+                setSending(null);
+            });
+    }
+
+    const addCommentToDispenser = (credentials, setSubmitting) => {
+        setMessage(message);
+
+        const url = "https://salty-river-31434.herokuapp.com/comment/addCommentToDispenser";
+
+        axios
+            .post(url, credentials)
+            .then((response) => {
+                const result = response.data;
+                const { status, message } = result;
+
+                if (status !== "SUCCESS") {
+                    setMessage(message);
+                    setSubmitting(false);
+
+                    return;
+                }
+
+                setSuccessMessage(message);
+                setSubmitting(false);
+            })
+            .catch(err => {
+                setSubmitting(false);
+                handleMessage("Error, provijeri svoju internetsku vezu, pa pokusaj ponovo!");
+            })
+
+    }
+
+    const addCommentToFacility = (credentials, setSubmitting) => {
+        setMessage(message);
+
+        const url = "https://salty-river-31434.herokuapp.com/comment/addCommentToFacility";
+
+        axios
+            .post(url, credentials)
+            .then((response) => {
+                const result = response.data;
+                const { status, message } = result;
+
+                if (status !== "SUCCESS") {
+                    setMessage(message);
+                    setSubmitting(false);
+
+                    return;
+                }
+
+                setSuccessMessage(message);
+                setSubmitting(false);
+            })
+            .catch(err => {
+                setSubmitting(false);
+                handleMessage("Error, provijeri svoju internetsku vezu, pa pokusaj ponovo!");
+            })
+
+    }
 
     return (
         <>
@@ -220,7 +425,9 @@ const Menu = ({ navigation }) => {
                         </TouchableOpacity>
 
                     </View>
-                    <View style={{ height: hp(61), overflow: "scroll" }}>
+
+                    {/* search scrool wiew */}
+                    <View style={{ height: hp(44), overflow: "scroll", marginBottom: hp(1) }}>
                         <ScrollView>
                             {/*Search dispensers*/}
                             <View style={styles.formikContainer}>
@@ -279,8 +486,8 @@ const Menu = ({ navigation }) => {
                                                         backgroundColor: "rgba(255,255,0,0.5)",
                                                         marginTop: hp(1)
                                                     }}>
-                                                        <MaterialCommunityIcons
-                                                            name="beer-outline"
+                                                        <Feather
+                                                            name="clipboard"
                                                             size={wp(3.5)}
                                                             color={"#000"}
                                                         />
@@ -296,7 +503,7 @@ const Menu = ({ navigation }) => {
 
                                                     <TouchableOpacity onPress={() => {
                                                         setSelectedDispenser(null);
-                                                        setExtend(false)
+                                                        setExtend(null)
                                                     }
                                                     }>
                                                         <View style={{
@@ -333,7 +540,7 @@ const Menu = ({ navigation }) => {
                                                             marginTop: hp(1)
                                                         }}>
                                                             <Feather
-                                                                name="edit-3"
+                                                                name="hash"
                                                                 size={wp(3.5)}
                                                                 color={"#000"}
                                                             />
@@ -357,7 +564,7 @@ const Menu = ({ navigation }) => {
                                                             marginTop: hp(1)
                                                         }}>
                                                             <Feather
-                                                                name="edit-3"
+                                                                name="activity"
                                                                 size={wp(3.5)}
                                                                 color={"#000"}
                                                             />
@@ -380,8 +587,8 @@ const Menu = ({ navigation }) => {
                                                             backgroundColor: "rgba(255,255,0,0.5)",
                                                             marginTop: hp(1)
                                                         }}>
-                                                            <Feather
-                                                                name="edit-3"
+                                                            <MaterialCommunityIcons
+                                                                name="engine-outline"
                                                                 size={wp(3.5)}
                                                                 color={"#000"}
                                                             />
@@ -481,7 +688,7 @@ const Menu = ({ navigation }) => {
                                                             marginTop: hp(1)
                                                         }}>
                                                             <Feather
-                                                                name="map-pin"
+                                                                name="alert-circle"
                                                                 size={wp(3.5)}
                                                                 color={"#000"}
                                                             />
@@ -491,7 +698,13 @@ const Menu = ({ navigation }) => {
 
                                                         <TouchableOpacity style={styles.invNumberTouch}>
                                                             <Text style={{ color: "#ff0" }}>Komentar:  </Text>
-                                                            <Text style={{ color: "#fff" }}>{selectedDispenser.comment}</Text>
+                                                            <View>
+                                                                {selectedDispenser.comment.map((comment, index) => {
+                                                                    return (
+                                                                        <Text key={index} style={{ color: "#fff" }}>- {comment}</Text>
+                                                                    );
+                                                                })}
+                                                            </View>
                                                         </TouchableOpacity>
                                                     </View>
                                                 </>
@@ -566,7 +779,7 @@ const Menu = ({ navigation }) => {
                                                                         marginTop: hp(1)
                                                                     }}>
                                                                         <MaterialCommunityIcons
-                                                                            name="beer-outline"
+                                                                            name="home"
                                                                             size={wp(3.5)}
                                                                             color={"#000"}
                                                                         />
@@ -618,7 +831,7 @@ const Menu = ({ navigation }) => {
                                                                                 marginTop: hp(1)
                                                                             }}>
                                                                                 <Feather
-                                                                                    name="edit-3"
+                                                                                    name="hash"
                                                                                     size={wp(3.5)}
                                                                                     color={"#000"}
                                                                                 />
@@ -642,7 +855,7 @@ const Menu = ({ navigation }) => {
                                                                                 marginTop: hp(1)
                                                                             }}>
                                                                                 <Feather
-                                                                                    name="edit-3"
+                                                                                    name="map-pin"
                                                                                     size={wp(3.5)}
                                                                                     color={"#000"}
                                                                                 />
@@ -666,7 +879,7 @@ const Menu = ({ navigation }) => {
                                                                                 marginTop: hp(1)
                                                                             }}>
                                                                                 <Feather
-                                                                                    name="edit-3"
+                                                                                    name="target"
                                                                                     size={wp(3.5)}
                                                                                     color={"#000"}
                                                                                 />
@@ -690,7 +903,7 @@ const Menu = ({ navigation }) => {
                                                                                 marginTop: hp(1)
                                                                             }}>
                                                                                 <Feather
-                                                                                    name="calendar"
+                                                                                    name="alert-circle"
                                                                                     size={wp(3.5)}
                                                                                     color={"#000"}
                                                                                 />
@@ -698,7 +911,13 @@ const Menu = ({ navigation }) => {
 
                                                                             <TouchableOpacity style={styles.invNumberTouch}>
                                                                                 <Text style={{ color: "#ff0" }}>Komentar:  </Text>
-                                                                                <Text style={{ color: "#fff" }}>{facility.comment}</Text>
+                                                                                <View>
+                                                                                    {facility.comment.map((comment, index) => {
+                                                                                        return (
+                                                                                            <Text key={index} style={{ color: "#fff" }}>- {comment}</Text>
+                                                                                        );
+                                                                                    })}
+                                                                                </View>
                                                                             </TouchableOpacity>
                                                                         </View>
 
@@ -713,8 +932,8 @@ const Menu = ({ navigation }) => {
                                                                                 backgroundColor: "rgba(255,255,0,0.5)",
                                                                                 marginTop: hp(1)
                                                                             }}>
-                                                                                <Feather
-                                                                                    name="calendar"
+                                                                                <MaterialCommunityIcons
+                                                                                    name="water-pump"
                                                                                     size={wp(3.5)}
                                                                                     color={"#000"}
                                                                                 />
@@ -748,6 +967,353 @@ const Menu = ({ navigation }) => {
                             </View>
                         </ScrollView>
                     </View>
+
+                    {/*Add comment */}
+                    {extend == facilityExtend && (
+                        <View style={styles.commentContainer}>
+                            <TouchableOpacity onPress={() => {
+                                setSelected(1);
+                            }}>
+                                <View style={[styles.exportIconContainer, styles.borderLeftComment]}>
+                                    <MaterialCommunityIcons name="water-pump" size={wp(5)} color={"#000"} />
+                                </View>
+                            </TouchableOpacity>
+                            <View style={styles.textContainer}>
+                                <Text style={{ color: Colors.white }}>Dodaj Komentar</Text>
+                            </View>
+                            <TouchableOpacity onPress={() => {
+                                setSelected(2);
+                            }}>
+                                <View style={[styles.exportIconContainer, styles.borderRightComment]}>
+                                    <MaterialIcons name="location-pin" size={wp(5)} color={"#000"} />
+                                </View>
+                            </TouchableOpacity>
+                        </View>
+                    )}
+
+                    {/* Modal Add comment to Dispenser */}
+                    <Modal
+                        animationType="slide"
+                        transparent={true}
+                        visible={selected === 1}
+                        onRequestClose={() => {
+                            setSelected(null);
+                            setMessage(null);
+                            setSuccessMessage(null);
+                        }}
+                    >
+                        <KeyboardAvoidingWrapper>
+                            <View style={styles.centeredView4}>
+                                <View style={styles.modalView4}>
+
+                                    <Formik
+                                        initialValues={{
+                                            comment: "",
+                                            invNumber: ""
+                                        }}
+                                        onSubmit={(values, { setSubmitting }) => {
+                                            values = { ...values };
+                                            addCommentToDispenser(values, setSubmitting);
+                                            setMessage(null);
+                                            setSuccessMessage(null);
+                                        }}
+                                    >
+                                        {
+                                            ({ handleChange, handleBlur, handleSubmit, setFieldValue, values, isSubmitting, handleReset }) => (
+                                                <View style={{ alignItems: "center" }}>
+
+                                                    <View style={styles.dispenserContainer}>
+                                                        <Input
+                                                            icon="user"
+                                                            placeholder="Unesi komentar..."
+                                                            placeholderTextColor="#888"
+                                                            onChangeText={handleChange("comment")}
+                                                            onBlur={handleBlur("comment")}
+                                                            value={values.comment}
+                                                            returnKeyType="next"
+                                                        />
+
+                                                        <Input
+                                                            icon="clipboard"
+                                                            placeholder="Inventurni broj"
+                                                            placeholderTextColor="#888"
+                                                            onChangeText={handleChange("invNumber")}
+                                                            onBlur={handleBlur("invNumber")}
+                                                            value={values.invNumber}
+                                                            returnKeyType="next"
+                                                        />
+                                                    </View>
+
+                                                    <MsgBox style={{ marginTop: hp(0.5) }}>{message}</MsgBox>
+                                                    <SuccessMsgBox>{successMessage}</SuccessMsgBox>
+
+                                                    {!isSubmitting ? (
+                                                        <SubmitButton style={{ marginTop: hp(1) }} onPress={handleSubmit}>
+                                                            <SubmitButtonText>submit</SubmitButtonText>
+                                                        </SubmitButton>
+                                                    ) : (
+                                                        <SubmitButton disabled={true}>
+                                                            <ActivityIndicator size={hp(2.5)} color="#fff" />
+                                                        </SubmitButton>
+                                                    )}
+
+                                                </View>
+                                            )
+                                        }
+                                    </Formik>
+
+                                    <TouchableOpacity
+                                        onPress={() => {
+                                            setSelected(null);
+                                            setSuccessMessage(null);
+                                            setMessage(null);
+                                        }}
+                                        style={{ marginVertical: hp(2) }}>
+                                        <Text style={{ color: "#fff" }}>Zatvori</Text>
+                                    </TouchableOpacity>
+                                </View>
+                            </View>
+                        </KeyboardAvoidingWrapper>
+                    </Modal>
+
+                    {/* Modal Add comment to Facility */}
+                    <Modal
+                        animationType="slide"
+                        transparent={true}
+                        visible={selected === 2}
+                        onRequestClose={() => {
+                            setSelected(null);
+                            setMessage(null);
+                            setSuccessMessage(null);
+                        }}
+                    >
+                        <KeyboardAvoidingWrapper>
+                            <View style={styles.centeredView4}>
+                                <View style={styles.modalView4}>
+
+                                    <Formik
+                                        initialValues={{
+                                            comment: "",
+                                            id: ""
+                                        }}
+                                        onSubmit={(values, { setSubmitting }) => {
+                                            values = { ...values };
+                                            addCommentToFacility(values, setSubmitting);
+                                            setMessage(null);
+                                            setSuccessMessage(null);
+                                        }}
+                                    >
+                                        {
+                                            ({ handleChange, handleBlur, handleSubmit, setFieldValue, values, isSubmitting, handleReset }) => (
+                                                <View style={{ alignItems: "center" }}>
+
+                                                    <View style={styles.dispenserContainer}>
+                                                        <Input
+                                                            icon="user"
+                                                            placeholder="Unesi komentar..."
+                                                            placeholderTextColor="#888"
+                                                            onChangeText={handleChange("comment")}
+                                                            onBlur={handleBlur("comment")}
+                                                            value={values.comment}
+                                                            returnKeyType="next"
+                                                        />
+
+                                                        <Input
+                                                            icon="clipboard"
+                                                            placeholder="ID objekta"
+                                                            placeholderTextColor="#888"
+                                                            onChangeText={handleChange("id")}
+                                                            onBlur={handleBlur("id")}
+                                                            value={values.id}
+                                                            returnKeyType="next"
+                                                        />
+                                                    </View>
+
+                                                    <MsgBox style={{ marginTop: hp(0.5) }}>{message}</MsgBox>
+                                                    <SuccessMsgBox>{successMessage}</SuccessMsgBox>
+
+                                                    {!isSubmitting ? (
+                                                        <SubmitButton style={{ marginTop: hp(1) }} onPress={handleSubmit}>
+                                                            <SubmitButtonText>submit</SubmitButtonText>
+                                                        </SubmitButton>
+                                                    ) : (
+                                                        <SubmitButton disabled={true}>
+                                                            <ActivityIndicator size={hp(2.5)} color="#fff" />
+                                                        </SubmitButton>
+                                                    )}
+
+                                                </View>
+                                            )
+                                        }
+                                    </Formik>
+
+                                    <TouchableOpacity
+                                        onPress={() => {
+                                            setSelected(null);
+                                            setSuccessMessage(null);
+                                            setMessage(null);
+                                        }}
+                                        style={{ marginVertical: hp(2) }}>
+                                        <Text style={{ color: "#fff" }}>Zatvori</Text>
+                                    </TouchableOpacity>
+                                </View>
+                            </View>
+                        </KeyboardAvoidingWrapper>
+                    </Modal>
+
+                    {/* export */}
+                    <View style={styles.exportContainer}>
+                        <View style={styles.exportItemsContainer}>
+                            <View style={[styles.exportItemContainer, styles.borderLeftRadious, styles.LeftBorderRightRadious]}>
+                                <TouchableOpacity onPress={() => {
+                                    setSuccessMail(null);
+                                    setCurrent(1);
+                                    setSending(1);
+                                    exportFacilityReportXlsx();
+                                }}>
+                                    {sending === 1 ? (
+                                        <View style={[styles.exportIconContainer, styles.borderLeftRadious]}>
+                                            <ActivityIndicator size={hp(2.5)} color="#000" />
+                                        </View>
+                                    ) : (
+                                        <View style={[styles.exportIconContainer, styles.borderLeftRadious]}>
+                                            {current !== 1 && (<MaterialCommunityIcons name="email-send-outline" size={wp(5.5)} color={"#000"} />)}
+                                            {successMail === 0 && current === 1 && (<MaterialCommunityIcons name="email-send-outline" size={wp(5.5)} color={"red"} />)}
+                                            {successMail === 1 && current === 1 && (<MaterialCommunityIcons name="email-send-outline" size={wp(5.5)} color={"green"} />)}
+                                        </View>
+                                    )}
+                                </TouchableOpacity>
+                                <Text style={[styles.marginRight, { color: Colors.white }]}>
+                                    Dnevno Izvješće
+                                </Text>
+                            </View>
+                            <View style={[styles.exportItemContainer, styles.borderRightRadious, styles.RightBorderLeftRadious]}>
+                                <Text style={[styles.marginLeft, { color: Colors.white }]}>
+                                    Tjedno Izvješće
+                                </Text>
+                                <TouchableOpacity onPress={() => {
+                                    setSuccessMail(null);
+                                    setCurrent(2);
+                                    setSending(2);
+                                    exportFacilities();
+                                }}>
+                                    {sending === 2 ? (
+                                        <View style={[styles.exportIconContainer, styles.borderRightRadious]}>
+                                            <ActivityIndicator size={hp(2.5)} color="#000" />
+                                        </View>
+                                    ) : (
+                                        <View style={[styles.exportIconContainer, styles.borderRightRadious]}>
+                                            {current !== 2 && (<MaterialCommunityIcons name="email-send-outline" size={wp(5.5)} color={"#000"} />)}
+                                            {successMail === 0 && current === 2 && (<MaterialCommunityIcons name="email-send-outline" size={wp(5.5)} color={"red"} />)}
+                                            {successMail === 1 && current === 2 && (<MaterialCommunityIcons name="email-send-outline" size={wp(5.5)} color={"green"} />)}
+                                        </View>
+                                    )}
+                                </TouchableOpacity>
+                            </View>
+                        </View>
+                        <View style={styles.exportItemsContainer}>
+                            <View style={[styles.exportItemContainer, styles.borderLeftRadious, styles.LeftBorderRightRadious]}>
+                                <TouchableOpacity onPress={() => {
+                                    setSuccessMail(null);
+                                    setCurrent(3);
+                                    setSending(3);
+                                    exportDispensersCentralXlsx();
+                                }}>
+                                    {sending === 3 ? (
+                                        <View style={[styles.exportIconContainer, styles.borderLeftRadious]}>
+                                            <ActivityIndicator size={hp(2.5)} color="#000" />
+                                        </View>
+                                    ) : (
+                                        <View style={[styles.exportIconContainer, styles.borderLeftRadious]}>
+                                            {current !== 3 && (<MaterialCommunityIcons name="email-send-outline" size={wp(5.5)} color={"#000"} />)}
+                                            {successMail === 0 && current === 3 && (<MaterialCommunityIcons name="email-send-outline" size={wp(5.5)} color={"red"} />)}
+                                            {successMail === 1 && current === 3 && (<MaterialCommunityIcons name="email-send-outline" size={wp(5.5)} color={"green"} />)}
+                                        </View>
+                                    )}
+                                </TouchableOpacity>
+                                <Text style={[styles.marginRight, { color: Colors.white }]}>
+                                    Točionici Centr
+                                </Text>
+                            </View>
+                            <View style={[styles.exportItemContainer, styles.borderRightRadious, styles.RightBorderLeftRadious]}>
+                                <Text style={[styles.marginLeft, { color: Colors.white }]}>
+                                    Točionici Rashod
+                                </Text>
+                                <TouchableOpacity onPress={() => {
+                                    setSuccessMail(null);
+                                    setCurrent(4);
+                                    setSending(4);
+                                    exportDispensersExpenseXlsx();
+                                }}>
+                                    {sending === 4 ? (
+                                        <View style={[styles.exportIconContainer, styles.borderRightRadious]}>
+                                            <ActivityIndicator size={hp(2.5)} color="#000" />
+                                        </View>
+                                    ) : (
+                                        <View style={[styles.exportIconContainer, styles.borderRightRadious]}>
+                                            {current !== 4 && (<MaterialCommunityIcons name="email-send-outline" size={wp(5.5)} color={"#000"} />)}
+                                            {successMail === 0 && current === 4 && (<MaterialCommunityIcons name="email-send-outline" size={wp(5.5)} color={"red"} />)}
+                                            {successMail === 1 && current === 4 && (<MaterialCommunityIcons name="email-send-outline" size={wp(5.5)} color={"green"} />)}
+                                        </View>
+                                    )}
+                                </TouchableOpacity>
+                            </View>
+                        </View>
+                        <View style={styles.exportItemsContainer}>
+                            <View style={[styles.exportItemContainer, styles.borderLeftRadious, styles.LeftBorderRightRadious]}>
+                                <TouchableOpacity onPress={() => {
+                                    setSuccessMail(null);
+                                    setCurrent(5);
+                                    setSending(5);
+                                    exportPartsXlsx();
+                                }}>
+                                    {sending === 5 ? (
+                                        <View style={[styles.exportIconContainer, styles.borderLeftRadious]}>
+                                            <ActivityIndicator size={hp(2.5)} color="#000" />
+                                        </View>
+                                    ) : (
+                                        <View style={[styles.exportIconContainer, styles.borderLeftRadious]}>
+                                            {current !== 5 && (<MaterialCommunityIcons name="email-send-outline" size={wp(5.5)} color={"#000"} />)}
+                                            {successMail === 0 && current === 5 && (<MaterialCommunityIcons name="email-send-outline" size={wp(5.5)} color={"red"} />)}
+                                            {successMail === 1 && current === 5 && (<MaterialCommunityIcons name="email-send-outline" size={wp(5.5)} color={"green"} />)}
+                                        </View>
+                                    )}
+                                </TouchableOpacity>
+                                <Text style={[styles.marginRight, { color: Colors.white }]}>
+                                    Djelovi Centr
+                                </Text>
+                            </View>
+                            <View style={[styles.exportItemContainer, styles.borderRightRadious, styles.RightBorderLeftRadious]}>
+                                <Text style={[styles.marginLeft, { color: Colors.white }]}>
+                                    Djelovi Rashod
+                                </Text>
+                                <TouchableOpacity onPress={() => {
+                                    setSuccessMail(null);
+                                    setCurrent(6);
+                                    setSending(6);
+                                    exportPartsExpenseXlsx();
+                                }}>
+                                    {sending === 6 ? (
+                                        <View style={[styles.exportIconContainer, styles.borderRightRadious]}>
+                                            <ActivityIndicator size={hp(2.5)} color="#000" />
+                                        </View>
+                                    ) : (
+                                        <View style={[styles.exportIconContainer, styles.borderRightRadious]}>
+                                            {current !== 6 && (<MaterialCommunityIcons name="email-send-outline" size={wp(5.5)} color={"#000"} />)}
+                                            {successMail === 0 && current === 6 && (<MaterialCommunityIcons name="email-send-outline" size={wp(5.5)} color={"red"} />)}
+                                            {successMail === 1 && current === 6 && (<MaterialCommunityIcons name="email-send-outline" size={wp(5.5)} color={"green"} />)}
+                                        </View>
+                                    )}
+                                </TouchableOpacity>
+                            </View>
+                        </View>
+                    </View>
+
+
+                    {/* <SubmitButton onPress={exportFacilities} style={{}}>
+                        <Text>Export Facility</Text>
+                    </SubmitButton> */}
+
 
                     {/* <View style={styles.scrollContainer}>
                         <TouchableOpacity onPress={handleExpiredDispensers}>
@@ -881,7 +1447,7 @@ const styles = StyleSheet.create({
     },
     invNumberTouch: {
         backgroundColor: "#000",
-        borderRadius: wp(50),
+        borderRadius: wp(1.5),
         marginTop: hp(1),
         flexDirection: "row",
         padding: wp(0.5),
@@ -931,6 +1497,108 @@ const styles = StyleSheet.create({
         elevation: 0,
         width: wp(100),
         height: hp(54)
+    },
+
+    exportContainer: {
+        backgroundColor: "rgba(255,255,255, 0.5)",
+        padding: wp(2),
+        borderRadius: wp(2)
+    },
+
+    exportItemsContainer: {
+        display: "flex",
+        flexDirection: "row",
+        justifyContent: "space-between"
+    },
+
+    exportItemContainer: {
+        display: "flex",
+        flexDirection: "row",
+        justifyContent: "space-between",
+        alignItems: "center",
+        backgroundColor: "rgba(0,0,0,0.9)",
+        width: wp(38),
+        height: hp(4),
+        margin: wp(1)
+    },
+
+    exportIconContainer: {
+        backgroundColor: "rgba(255,255,0,0.9)",
+        height: hp(4),
+        width: wp(10),
+        alignItems: "center",
+        justifyContent: "center"
+    },
+
+    borderLeftRadious: {
+        borderTopLeftRadius: wp(10),
+        borderBottomLeftRadius: wp(10)
+    },
+
+    borderRightRadious: {
+        borderTopRightRadius: wp(10),
+        borderBottomRightRadius: wp(10)
+    },
+
+    RightBorderLeftRadious: {
+        borderTopLeftRadius: wp(2),
+        borderBottomLeftRadius: wp(2)
+    },
+
+    LeftBorderRightRadious: {
+        borderTopRightRadius: wp(2),
+        borderBottomRightRadius: wp(2)
+    },
+
+    marginRight: {
+        marginRight: wp(2)
+    },
+
+    marginLeft: {
+        marginLeft: wp(2)
+    },
+
+    commentContainer: {
+        display: "flex",
+        flexDirection: "row",
+        backgroundColor: "rgba(255,255,255, 0.5)",
+        padding: wp(2),
+        borderRadius: wp(2),
+        position: "absolute",
+        bottom: hp(43)
+    },
+
+    textContainer: {
+        backgroundColor: "rgba(0,0,0,0.9)",
+        justifyContent: "center",
+        padding: wp(2)
+    },
+
+    borderLeftComment: {
+        borderTopLeftRadius: wp(1),
+        borderBottomLeftRadius: wp(1)
+    },
+
+    borderRightComment: {
+        borderTopRightRadius: wp(1),
+        borderBottomRightRadius: wp(1)
+    },
+
+    centeredView4: {
+        position: "relative",
+        marginTop: hp(54)
+    },
+
+    modalView4: {
+        backgroundColor: "rgba(0,0,0,0.93)",
+        borderTopLeftRadius: wp(7),
+        borderTopRightRadius: wp(7),
+        padding: wp(5),
+        alignItems: "center",
+        shadowColor: "#000",
+        elevation: 0,
+        width: wp(100),
+        height: hp(37)
     }
 });
 
